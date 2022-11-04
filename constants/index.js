@@ -1,0 +1,1 @@
+module.exports.KEYS = require("./key-signatures").KEYS;
