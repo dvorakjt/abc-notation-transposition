@@ -15,13 +15,13 @@ module.exports.KEYS = new SimpleCircularArray([
             numOfAccidentals: 0,
             contains: ACCIDENTALS.NONE,
             keySig: {
-                A: "",
-                B: "",
-                C: "",
-                D: "",
-                E: "",
-                F: "",
-                G: ""
+                A: "=",
+                B: "=",
+                C: "=",
+                D: "=",
+                E: "=",
+                F: "=",
+                G: "="
             }
         },
     ],
@@ -59,10 +59,10 @@ module.exports.KEYS = new SimpleCircularArray([
             keySig: {
                 A: "_",
                 B: "_",
-                C: "",
+                C: "=",
                 D: "_",
                 E: "_",
-                F: "",
+                F: "=",
                 G: "_"
             }
         },
@@ -79,13 +79,13 @@ module.exports.KEYS = new SimpleCircularArray([
             numOfAccidentals: 2,
             contains: ACCIDENTALS.SHARPS,
             keySig: {
-                A: "",
-                B: "",
+                A: "=",
+                B: "=",
                 C: "^",
-                D: "",
-                E: "",
+                D: "=",
+                E: "=",
                 F: "^",
-                G: ""
+                G: "="
             }
         },
     ],
@@ -103,11 +103,11 @@ module.exports.KEYS = new SimpleCircularArray([
             keySig: {
                 A: "_",
                 B: "_",
-                C: "",
-                D: "",
+                C: "=",
+                D: "=",
                 E: "_",
-                F: "",
-                G: ""
+                F: "=",
+                G: "="
             }
         },
     ],
@@ -123,11 +123,11 @@ module.exports.KEYS = new SimpleCircularArray([
             numOfAccidentals: 0,
             contains: ACCIDENTALS.SHARPS,
             keySig: {
-                A: "",
-                B: "",
+                A: "=",
+                B: "=",
                 C: "^",
                 D: "^",
-                E: "",
+                E: "=",
                 F: "^",
                 G: "^"
             }
@@ -145,13 +145,13 @@ module.exports.KEYS = new SimpleCircularArray([
             numOfAccidentals: 1,
             contains: ACCIDENTALS.FLATS,
             keySig: {
-                A: "",
+                A: "=",
                 B: "_",
-                C: "",
-                D: "",
-                E: "",
-                F: "",
-                G: ""
+                C: "=",
+                D: "=",
+                E: "=",
+                F: "=",
+                G: "="
             }
         },
     ],
@@ -168,7 +168,7 @@ module.exports.KEYS = new SimpleCircularArray([
             contains: ACCIDENTALS.SHARPS,
             keySig: {
                 A: "^",
-                B: "",
+                B: "=",
                 C: "^",
                 D: "^",
                 E: "^",
@@ -192,7 +192,7 @@ module.exports.KEYS = new SimpleCircularArray([
                 C: "_",
                 D: "_",
                 E: "_",
-                F: "",
+                F: "=",
                 G: "_"
             }
         },
@@ -209,13 +209,13 @@ module.exports.KEYS = new SimpleCircularArray([
             numOfAccidentals: 1,
             contains: ACCIDENTALS.SHARPS,
             keySig: {
-                A: "",
-                B: "",
-                C: "",
-                D: "",
-                E: "",
+                A: "=",
+                B: "=",
+                C: "=",
+                D: "=",
+                E: "=",
                 F: "^",
-                G: ""
+                G: "="
             }
         },
     ],
@@ -233,11 +233,11 @@ module.exports.KEYS = new SimpleCircularArray([
             keySig: {
                 A: "_",
                 B: "_",
-                C: "",
+                C: "=",
                 D: "_",
                 E: "_",
-                F: "",
-                G: ""
+                F: "=",
+                G: "="
             }
         },
     ],
@@ -253,11 +253,11 @@ module.exports.KEYS = new SimpleCircularArray([
             numOfAccidentals: 3,
             contains: ACCIDENTALS.SHARPS,
             keySig: {
-                A: "",
-                B: "",
+                A: "=",
+                B: "=",
                 C: "^",
-                D: "",
-                E: "",
+                D: "=",
+                E: "=",
                 F: "^",
                 G: "^"
             }
@@ -275,13 +275,13 @@ module.exports.KEYS = new SimpleCircularArray([
             numOfAccidentals: 2,
             contains: ACCIDENTALS.FLATS,
             keySig: {
-                A: "",
+                A: "=",
                 B: "_",
-                C: "",
-                D: "",
+                C: "=",
+                D: "=",
                 E: "_",
-                F: "",
-                G: ""
+                F: "=",
+                G: "="
             }
         },
     ],
@@ -298,10 +298,10 @@ module.exports.KEYS = new SimpleCircularArray([
             contains: ACCIDENTALS.SHARPS,
             keySig: {
                 A: "^",
-                B: "",
+                B: "=",
                 C: "^",
                 D: "^",
-                E: "",
+                E: "=",
                 F: "^",
                 G: "^"
             }
