@@ -1,1 +1,10 @@
-module.exports.KEYS = require("./key-signatures").KEYS;
+const {DIATONIC_PITCHES, ENHARMONIC_PITCHES} = require('./pitches');
+const {KEYS} = require('./keys');
+const {ACCIDENTALS, ACCIDENTAL_NUMBER_PREFERENCES, SHARPS_OR_FLATS_PREFERENCES} = require('./preferences');
+
+module.exports.DIATONIC_PITCHES = DIATONIC_PITCHES;
+module.exports.ENHARMONIC_PITCHES = ENHARMONIC_PITCHES;
+module.exports.KEYS = KEYS;
+module.exports.ACCIDENTALS = ACCIDENTALS;
+module.exports.ACCIDENTAL_NUMBER_PREFERENCES = ACCIDENTAL_NUMBER_PREFERENCES;
+module.exports.SHARPS_OR_FLATS_PREFERENCES = SHARPS_OR_FLATS_PREFERENCES;

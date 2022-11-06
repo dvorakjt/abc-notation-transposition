@@ -1,5 +1,4 @@
-const {SimpleCircularArray} = require('../classes/SimpleCircularArray');
-const {KEYS} = require("../constants");
+const {DIATONIC_PITCHES, ENHARMONIC_PITCHES, KEYS} = require('../constants');
 
 Object.defineProperty(String.prototype, 'isUpperCase', {
     value: function() {
@@ -8,14 +7,37 @@ Object.defineProperty(String.prototype, 'isUpperCase', {
     enumerable: false
 });
 
-function transposePitchByKey (oldKey, newKey, mode, halfSteps, pitch) { //how to handle multiple octaves?
+/*this is going to have to return an object
+    the object should look thus:
+        {
+            transposedPitch: "_B,,",
+            lastWrittenModifiers: {
+                A : "", //accidentals that occurred earlier in the measure
+                B : "",
+                C : "",
+                D : "",
+                E : "",
+                F : "",
+                G : ""
+            },
+            lastIntroducedModifiers: {
+
+            }
+        }
+    when a note is modified by a chromatic tranposition function, that modification should be added to that note
+    when a note that has been modified occurs as a result of transpotion by key, that note should have its accidental displayed
+    and the modifier should be wiped out from the list
+
+    this list will also be reset in the regex that scans for notes by scanning for barlines \|
+
+    as an example, you have an __A in F major
+    you transpose this to Eb major 
+*/
+module.exports.transposePitchByKey = function (oldKey, newKey, mode, halfSteps, pitch) { //how to handle multiple octaves?
     //get the scale degree
     const oldKeyLetter = getPitchLetter(oldKey[mode]);
-    console.log(oldKeyLetter);
     const pitchLetter = getPitchLetter(pitch);
-    console.log(pitchLetter);
     const scaleDegree = getScaleDegreeFromPitch(oldKeyLetter, pitchLetter);
-    console.log(scaleDegree);
     //get the new pitch letter
     const newKeyLetter = getPitchLetter(newKey[mode]);
     console.log(newKeyLetter);
@@ -33,19 +55,17 @@ function getPitchLetter(pitch) {
 }
 
 function getScaleDegreeFromPitch(keyLetter, pitchLetter) {
-    const alphabet = new SimpleCircularArray(["A", "B", "C", "D", "E", "F", "G"]);
     const thisScale = [];
-    for(let i = alphabet.findIndex(k => k === keyLetter); i < alphabet.findIndex(k => k === keyLetter) + 7; i++) {
-        thisScale.push(alphabet.get(i));
+    for(let i = DIATONIC_PITCHES.findIndex(k => k === keyLetter); i < DIATONIC_PITCHES.findIndex(k => k === keyLetter) + 7; i++) {
+        thisScale.push(DIATONIC_PITCHES.get(i));
     }
     return thisScale.indexOf(pitchLetter.toUpperCase());
 }
 
 function getPitchFromScaleDegree(keyLetter, scaleDegree) {
-    const alphabet = new SimpleCircularArray(["A", "B", "C", "D", "E", "F", "G"]);
     const thisScale = [];
-    for(let i = alphabet.findIndex(k => k === keyLetter); i < alphabet.findIndex(k => k === keyLetter) + 7; i++) {
-        thisScale.push(alphabet.get(i));
+    for(let i = DIATONIC_PITCHES.findIndex(k => k === keyLetter); i < DIATONIC_PITCHES.findIndex(k => k === keyLetter) + 7; i++) {
+        thisScale.push(DIATONIC_PITCHES.get(i));
     }
     return thisScale[scaleDegree];
 }
@@ -247,6 +267,30 @@ function modifyAccidental(keySignature, pitch, modifier) {
     }
 }
 
+function transposePitchChromatically(pitch, lastIntroducedModifiers, halfSteps) {
+    //transpose by half steps
+    //consult last introducedModifiers
+    //these default to be the same as last written modifiers, which default to the key signature
+    //try to find a note that matches a lastIntroducedModifier
+    //if one does not exist, choose the PATH OF LEAST RESISTENCE?
+    const pitchGroupIndex = ENHARMONIC_PITCHES.findIndex(pitchToLetterAndAccidental(pitch));
+    const newPitchGroup = ENHARMONIC_PITCHES.get(pitchGroupIndex + halfSteps);
+    let newPitch = null;
+    for(letter in lastIntroducedModifiers) {
+        if(newPitchGroup.includes(lastIntroducedModifiers[letter] + letter)) {
+            newPitch = lastIntroducedModifiers[letter] + letter;
+            break;
+        }
+    }
+    if(!newPitch) {
+        
+    }
+}
+
+function pitchToLetterAndAccidental(pitch) {
+    return pitch.match(/((_{0,2})|(\^{0,2})|(={0,1}))[A-G]/i)[0].toUpperCase();
+}
+
 
 function handleMinorThird() {
     return "fix this later";
@@ -255,8 +299,3 @@ function handleMinorThird() {
 function handleMajorThird() {
     return "fix this later";
 }
-
-const CMAJOR = KEYS.get(0)[0];
-const DMAJOR = KEYS.get(2)[0];
-
-console.log(transposePitchByKey(CMAJOR, DMAJOR, "major", 14, "E"));

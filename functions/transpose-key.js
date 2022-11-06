@@ -1,5 +1,4 @@
-const {KEYS} = require("../constants");
-const {ACCIDENTALS, ACCIDENTAL_NUMBER_PREFERENCES, SHARPS_OR_FLATS_PREFERENCES} = require("../constants/constants");
+const {KEYS, ACCIDENTALS, ACCIDENTAL_NUMBER_PREFERENCES, SHARPS_OR_FLATS_PREFERENCES} = require('../constants');
 
 Object.defineProperty(String.prototype, 'includesIgnoreCase', {
     value: function(substr) {
