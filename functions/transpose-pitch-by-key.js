@@ -1,6 +1,6 @@
 const {DIATONIC_PITCHES, ENHARMONIC_PITCHES} = require('../constants');
 
-module.exports.transposePitch = function (
+module.exports.transposePitchByKey = function (
     originalPitch,
     originalKey,
     transposedKey,
@@ -194,7 +194,13 @@ function transposePitchChromatically(pitchLetter, keySignatureAccidental, deviat
         }
     }
     if(!transposedPitchLetter) {
-        const transposedPitch = transposedPitchGroup[0];
+        //if the pitch group contains a natural note, prefer that. otherwise, prefer a flat if the note was transposed down or
+        //a sharp if it was transposed up
+        let transposedPitch = transposedPitchGroup.find(pitch => pitch.match(/=/));
+        if(!transposedPitch) {
+            if(deviationFromKeySignature < 0) transposedPitch = transposedPitchGroup.find(pitch => pitch.match(/^_[A-G]$/));
+            else transposedPitch = transposedPitchGroup.find(pitch => pitch.match(/^\^[A-G]$/))
+        }
         transposedPitchLetter = getPitchLetter(transposedPitch);
         transposedAccidental = getAccidental(transposedPitch);
         storedAccidentals[transposedPitchLetter] = transposedAccidental;

@@ -7,10 +7,12 @@ Object.defineProperty(String.prototype, 'includesIgnoreCase', {
     enumerable: false
 });
 
-module.exports.transposeKey = function (key, steps, opts) {
+//expects a capital letter as per the ABC standard
+module.exports.transposeKey = function (key, halfSteps, opts) {
     if(!key.length || key === 'none') return key; //preserve the key if there is no key
     //first find the key in the table
-    let letter = key.replace(/dorian|dor|phrygian|phr|mixolydian|mix|lydian|lyd|minor|min|m|locrian|loc/i, "");
+    let letter = key.replace(/dorian|dor|phrygian|phr|mixolydian|mix|lydian|lyd|minor|min|m|locrian|loc/i, "").trim();
+    console.log(letter);
     let mode = 'major';
     if(key.includesIgnoreCase('dor')) {
         mode = 'dorian';
@@ -30,10 +32,13 @@ module.exports.transposeKey = function (key, steps, opts) {
               return key[mode] === letter;
         }) != -1);
     });
+    console.log(currentKeyPairIndex);
     const currentKeyObj = KEYS.get(currentKeyPairIndex).find((key) => {
         return key[mode] === letter;
     });
-    const transposedKeyPair = KEYS.get(currentKeyPairIndex + steps);
+    console.log(currentKeyObj);
+    const transposedKeyPair = KEYS.get(currentKeyPairIndex + halfSteps);
+    console.log(halfSteps);
     let transposedKeyObj;
     if(transposedKeyPair.length === 1) {
         transposedKeyObj = transposedKeyPair[0];
