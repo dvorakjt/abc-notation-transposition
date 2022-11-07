@@ -2,13 +2,10 @@ const {DIATONIC_PITCHES, ENHARMONIC_PITCHES} = require('../constants');
 
 module.exports.transposePitchByKey = function (
     originalPitch,
-    originalKey,
-    transposedKey,
-    mode,
-    lastOriginalAccidentals,
-    lastTransposedAccidentals,
+    voiceState,
     halfSteps
 ) {
+    const {originalKey, transposedKey, mode} = voiceState;
     //get pitch & key letters
     const originalPitchLetter = getPitchLetter(originalPitch); //returns a capital letter
     const originalKeyLetter = getPitchLetter(originalKey[mode]);
@@ -20,12 +17,12 @@ module.exports.transposePitchByKey = function (
     //get the note's accidental or null
     let originalAccidental = getAccidental(originalPitch); //returns "", "=", "_", "__", "^", "^^" or null
     //if null, get the lastOriginalAccidental
-    if(!originalAccidental) originalAccidental = getStoredAccidental(lastOriginalAccidentals, originalPitchLetter); //returns "=", "_", "__", "^", or "^^"
-    //if it does, update lastOriginalAccidentals
-    else updateStoredAccidentals(lastOriginalAccidentals, originalPitchLetter, originalAccidental); //returns void
+    if(!originalAccidental) originalAccidental = getStoredAccidental(voiceState.originalAccidentals, originalPitchLetter); //returns "=", "_", "__", "^", or "^^"
+    //if it does, update voiceState.originalAccidentals
+    else updateStoredAccidentals(voiceState.originalAccidentals, originalPitchLetter, originalAccidental); //returns void
     //get the amount the pitch is modified by
     const deviationFromKeySignature = getDeviationFromKeySignature(originalPitchLetter, originalAccidental, originalKey.keySig);
-    const [transposedPitch, transposedAccidental, displayAccidental] = applyDeviation(transposedPitchLetter, transposedKey.keySig, deviationFromKeySignature, lastTransposedAccidentals); 
+    const [transposedPitch, transposedAccidental, displayAccidental] = applyDeviation(transposedPitchLetter, transposedKey.keySig, deviationFromKeySignature, voiceState.transposedAccidentals); 
     //calculate octaves
     const octaveModifierCount = countOctaveModifiers(originalPitch, transposedPitch, halfSteps);
     let transposedPitchAtOctave = applyOctaveModifiers(originalPitch, transposedPitch, octaveModifierCount);

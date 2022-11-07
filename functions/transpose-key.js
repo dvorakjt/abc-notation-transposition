@@ -1,5 +1,6 @@
 const {KEYS, ACCIDENTALS, ACCIDENTAL_NUMBER_PREFERENCES, SHARPS_OR_FLATS_PREFERENCES} = require('../constants');
 
+//replace this with a utility function, which should be imported from functions/utils
 Object.defineProperty(String.prototype, 'includesIgnoreCase', {
     value: function(substr) {
       return this.toUpperCase().includes(substr.toUpperCase());
@@ -9,7 +10,8 @@ Object.defineProperty(String.prototype, 'includesIgnoreCase', {
 
 //expects a capital letter as per the ABC standard
 module.exports.transposeKey = function (key, halfSteps, opts) {
-    if(!key.length || key === 'none') return key; //preserve the key if there is no key
+    //return the key if key is HP, Hp, none or an empty string
+    if(key === 'HP' || key === 'Hp' || key === 'none' || key === '') return key;
     //first find the key in the table
     let letter = key.replace(/dorian|dor|phrygian|phr|mixolydian|mix|lydian|lyd|minor|min|m|aeolian|aeo|locrian|loc/i, "").trim();
     let mode = 'major';
