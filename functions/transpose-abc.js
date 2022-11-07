@@ -2,15 +2,14 @@ const {ACCIDENTAL_NUMBER_PREFERENCES, SHARPS_OR_FLATS_PREFERENCES, KEYS} = requi
 const {transposeKey} = require('./transpose-key');
 const {transposePitchByKey} = require('./transpose-pitch-by-key');
 
-//need to transpose key in header but keep other information (ex clef)
 //need to preserve lyrics and other text
 //need to ignore clef:perc and key:HP / Hp (bagpipe music) when transposing
 //probably cannot just glue each voice together at the end as there may be information that changes throughout the voice (e.x. clef, or even transposition, for instance, switching to clarinet in A)
-//^the solution may be to just leave [V:] fieldpreserve clef and transposition information in key and voice fields
+//^the solution may be to just leave [V:] field + preserve clef and transposition information in key and voice fields
 //need to s in place within the voice, and to make sure that values provided after an inline [K:] field are also retained
 //need to support atonal transposition
 //need to support + signs in tune body
-
+//**information fields may contain spaces after the opening colon!**
 //need to support reading abc file DATA (not the file itself) with multiple tunes
 //need to support generating (but not actually writing) abc files with transposed tunes
 //need to transpose macros
@@ -19,22 +18,28 @@ function transposeABC(abcTune, halfSteps, opts = {
     accidentalNumberPreference: ACCIDENTAL_NUMBER_PREFERENCES.PREFER_FEWER,
     preferSharpsOrFlats: SHARPS_OR_FLATS_PREFERENCES.PRESERVE_ORIGINAL
 }) {
-    const [tuneHead, tuneKeyField, tuneBody] = splitHeadKeyAndBody(abcTune); //replace this with new method
-    const originalKey = getKeyFromField(tuneKeyField);
-    const originalKeyInstructions = getInstructionsFromKeyField(tuneKeyField);
-    const transposedKey = transposeKey(originalKey, halfSteps, opts); //this is cool, but don't forget that keys in the head must be transposed too
-    console.log(transposedKey);
+    const [tuneHead, tuneKeyField, tuneBody] = splitHeadKeyAndBody(abcTune);
+    const originalKeyStr = getKeyStrFromField(tuneKeyField);
+    const [originalKey, originalMode] = getKeyObjectAndMode(originalKeyStr);
+    const transposedKey = transposeKey(originalKeyStr, halfSteps, opts);
     const voices = groupVoices(tuneBody);
-    const transposedVoices = transposeVoices(voices, originalKey, transposedKey, halfSteps, opts);
-    const voiceInfo = getVoiceInfo(tuneBody);
-    let transposedABC = '';
-    Object.keys(transposedVoices).forEach(voiceName => {
-        transposedABC += 'V:' + voiceName;
-        if(voiceName in voiceInfo) transposedABC += ' ' + voiceInfo[voiceName];
-        transposedABC += '\n'; 
-        transposedABC += transposedVoices[voiceName];
+    const transposedVoices = transposeVoices(voices, originalKey, originalMode, transposedKey, halfSteps, opts);
+    let sortedVoices = [];
+    for(let voiceName in transposedVoices) {
+        const voice = transposedVoices[voiceName];
+        for(let voiceLineObj of voice) {
+            sortedVoices.push(voiceLineObj);
+        }
+    }
+    sortedVoices.sort((a,b) => {
+        return a.originalLine - b.originalLine
     });
-    return tuneHead + '\n' + transposedABC;
+    sortedVoices = sortedVoices.map(voiceLineObj => {
+        return voiceLineObj.abcNotation;
+    });
+    const transposedTuneBody = sortedVoices.join('\n');
+    const newHeadKeyStr = 'K:' + transposedKey[originalMode] + originalMode + getInstructionsFromKeyField(tuneKeyField);
+    return tuneHead + newHeadKeyStr + transposedTuneBody;
 }
 
 function splitHeadKeyAndBody(abcTune) {
@@ -45,12 +50,16 @@ function splitHeadKeyAndBody(abcTune) {
     return [header, key, body];
 }
 
-function getKeyFromField(field) {
+function getKeyStrFromField(field) {
     let key = '';
     const keyLetterMatches = field.match(/([A-Ga-g]b{0,1}#{0,1})|none/);
     if(keyLetterMatches) {
         key += keyLetterMatches[0];
         if(key != 'none') {
+            //first replace 'middle' so as not to confuse the modes into matching with minor
+            const middleRegex = /middle/;
+            field = field.replace(middleRegex, "");
+            //then match with modes
             const modes = /(major|maj|dorian|dor|phrygian|phr|mixolydian|mix|lydian|lyd|minor|min|m|locrian|loc)/i; 
             const modeMatches = field.match(modes);
             if(modeMatches && !modeMatches[0].match(/major|maj/i)) { //ignores major / maj
@@ -61,80 +70,110 @@ function getKeyFromField(field) {
     return key;
 }
 
-//PICK UP HERE
 function getInstructionsFromKeyField(keyField) {
-    const legalKeyFields = /((clef=){0,1}(treble|alto|tenor|bass|perc|none)([+\-]8){0,1}|(middle=[^\s]+)|(transpose=[+\-]{0,1}\d+)|(octave=))/g
-    return keyField.match()
+    const clefRegexStr = "((clef=){0,1}(treble|alto|tenor|bass|perc|none)([+\\-]8){0,1})";
+    const middleRegexStr = "(middle=[^\\s\\]]+)";
+    const transpositionRegexStr = "(transpose=[+\-]{0,1}\\d+)";
+    const octaveRegexStr = "(octave=\\d+)";
+    const staffLinesRegexStr = "(stafflines=\\d+)";
+    const legalKeyFieldsRegexStr = clefRegexStr + "|" + middleRegexStr + "|" + transpositionRegexStr + "|" + octaveRegexStr + "|" + staffLinesRegexStr;
+    const legalKeyFields = new RegExp(legalKeyFieldsRegexStr, 'gi');
+    const instructions = keyField.match(legalKeyFields);
+    if(!instructions) return '';
+    else return ' ' + instructions.join(' ');
 }
 
+/*voices should be grouped into arrays of voice line objects
+voices = {
+  voiceName: [
+    {
+      originalLine
+      abcNotation
+    },
+  ]
+}
+*/
+
 function groupVoices(tuneBody) {
-    const voiceNames = getVoiceNames(tuneBody);
-    const voiceTuneBodies = getVoiceTuneBodies(tuneBody);
-    const voices = {};
-    voiceNames.forEach(voiceName => {
-        if(!voices[voiceName]) voices[voiceName] = '';
-    });
-    for(let i = 0; i < voiceTuneBodies.length; i++) {
-        voices[voiceNames[i]] += voiceTuneBodies[i];
+    let voices = {};
+    const tuneLines = tuneBody.split('\n');
+    let currentVoiceName = '';
+    for(let i = 0; i < tuneLines.length; i++) {
+        const currentLine = tuneLines[i];
+        const newVoiceName = getVoiceName(currentLine);
+        if(newVoiceName) currentVoiceName = newVoiceName;
+        if(!voices[currentVoiceName]) voices[currentVoiceName] = [];
+        voices[currentVoiceName].push({
+            originalLine: i,
+            abcNotation: currentLine
+        });
     }
     return voices;
 }
 
-function getVoiceNames(tuneBody) {
-    const voiceNameLines = tuneBody.match(/(V:[^\]\n]+\n)|(\[V:.+\])/g);
-    const voiceNames = voiceNameLines.map((voiceNameStr) => {
-        const firstSplit = voiceNameStr.split("V:");
-        const secondSplit = firstSplit[1].split(/[\s\]]/);
-        return secondSplit[0];
-    });
-    return voiceNames;
-}
-
-function getVoiceTuneBodies(tuneBody) {
-    if(tuneBody.startsWith("V:") || tuneBody.startsWith("[V:")) {
-        const firstDelimiterRemoved = tuneBody.replace(/(V:[^\]\n]+\n)|(\[V:.+\])/, "");
-        return firstDelimiterRemoved.split(/(?:V:[^\]\n]+\n)|(?:\[V:.+\])/);
-    } else return tuneBody.split(/(?:V:[^\]\n]+\n)|(?:\[V:.+\])/);
+function getVoiceName(voiceLine) {
+    const voiceFieldMatches = voiceLine.match(/V:\s*[^\s]+(\s|\])/);
+    if(!voiceFieldMatches) return null;
+    const voiceField = voiceFieldMatches[0];
+    const voiceName = voiceField.split(":")[1].trim();
+    return voiceName;
 }
 
 
-function transposeVoices(voices, originalStartingKeyStr, transposedStartingKey, halfSteps, opts) {
+function transposeVoices(voices, originalStartingKey, originalMode, transposedStartingKey, halfSteps, opts) {
     const transposedVoices = {};
     Object.keys(voices).forEach(voiceName => {
-       let [currentOriginalKey, currentMode] = getKeyObjectAndMode(originalStartingKeyStr);
-       let currentTransposedKey = transposedStartingKey;
-       let currentOriginalAccidentals = Object.assign({}, currentOriginalKey.keySig);
-       let currentTransposedAccidentals = Object.assign({}, currentTransposedKey.keySig);
-       const fieldCommentSymbolNewMeasureOrNote = /(\[\w:.*\])|(%.*\n)|(\![^\s]+\!)|(\|)|(_*\^*={0,1}[A-Ga-g],*'*)/g;
-       transposedVoices[voiceName] = voices[voiceName].replace(fieldCommentSymbolNewMeasureOrNote, str => {
-            const commentOrSymbol = /(%.*\n)|(\![^\s]+!)/;
-            const field = /\[\w:.*\]/;
-            const newMeasure = /\|/;
-            if(str.match(commentOrSymbol)) {
-                return str;
-            } else if(str.match(field)) {
-                if(str[1] === 'K') {
-                    const keyStr = getKeyFromField(str);
-                    console.log(keyStr);
-                    [currentOriginalKey, currentMode] = getKeyObjectAndMode(keyStr);
-                    currentOriginalAccidentals = Object.assign({}, currentOriginalKey.keySig);
-                    console.log("line 103");
-                    console.log(currentOriginalAccidentals);
-                    currentTransposedKey = transposeKey(keyStr, halfSteps, opts);
-                    const currentTransposedKeyStr = currentTransposedKey[currentMode] + currentMode;
-                    currentTransposedAccidentals = Object.assign({}, currentTransposedKey.keySig);
-                    return str.replace(/\[K:[^\]]+\]/, "[K:" + currentTransposedKeyStr  + "]");
-                } else return str;
-            } else if(str.match(newMeasure)) {
-                currentOriginalAccidentals = Object.assign({}, currentOriginalKey.keySig);
-                currentTransposedAccidentals = Object.assign({}, currentTransposedAccidentals);
-                return str;
-            } else {
-                return transposePitchByKey(str, currentOriginalKey, currentTransposedKey, currentMode, currentOriginalAccidentals, currentTransposedAccidentals, halfSteps);
+        let currentOriginalKey = originalStartingKey;
+        let currentMode = originalMode;
+        let currentTransposedKey = transposedStartingKey;
+        let currentOriginalAccidentals = Object.assign({}, currentOriginalKey.keySig);
+        let currentTransposedAccidentals = Object.assign({}, currentTransposedKey.keySig);
+        transposedVoices[voiceName] = voices[voiceName].map(voiceLineObj => {
+            const voiceLine = voiceLineObj.abcNotation;
+            const transposedLine = transposeVoiceLine(voiceLine, currentOriginalKey, currentTransposedKey, currentMode, currentOriginalAccidentals, currentTransposedAccidentals, halfSteps, opts)
+            return {
+                ...voiceLineObj,
+                abcNotation: transposedLine
             }
-       });
+        });
     });
     return transposedVoices;
+}
+
+//probably need current clef too
+function transposeVoiceLine(voiceLine, currentOriginalKey, currentTransposedKey, currentMode, currentOriginalAccidentals, currentTransposedAccidentals, halfSteps, opts) {
+    //do not attempt to transpose if the voice line is an empty string, if the line is a continuation of a field (starts with +),
+    //if the line is a comment or directive (starts with one or more %), or if the line is a field line
+    if(!voiceLine.length) return voiceLine;
+    if(voiceLine.startsWith("+") || voiceLine.startsWith("%")) return voiceLine;
+    const fieldLineRegex = /[IKLMmNPQRrsTUVWw]:/;
+    if(voiceLine.substring(0,2).match(fieldLineRegex)) return voiceLine;
+    const fieldCommentSymbolNewMeasureOrNote = /(\[\w:.*\])|(%.*\n)|(\![^\s]+\!)|(\|)|(::)|(_*\^*={0,1}[A-Ga-g],*'*)/g;
+    return voiceLine.replace(fieldCommentSymbolNewMeasureOrNote, str => {
+        const commentOrSymbol = /(%.*\n)|(\![^\s]+!)/;
+        const field = /\[\w:.*\]/;
+        const newMeasure = /(\|)|(::)/;
+        if(str.match(commentOrSymbol)) {
+            return str;
+        } else if(str.match(field)) {
+            if(str[1] === 'K') { // this needs to retain information besides K:
+                const keyInstructions = getInstructionsFromKeyField(str);
+                const keyStr = getKeyStrFromField(str);
+                [currentOriginalKey, currentMode] = getKeyObjectAndMode(keyStr);
+                currentOriginalAccidentals = Object.assign({}, currentOriginalKey.keySig);
+                currentTransposedKey = transposeKey(keyStr, halfSteps, opts);
+                const currentTransposedKeyStr = currentTransposedKey[currentMode] + currentMode;
+                currentTransposedAccidentals = Object.assign({}, currentTransposedKey.keySig);
+                return str.replace(/\[K:[^\]]+\]/, "[K:" + currentTransposedKeyStr  + keyInstructions + "]");
+            } else return str;
+        } else if(str.match(newMeasure)) {
+            currentOriginalAccidentals = Object.assign({}, currentOriginalKey.keySig);
+            currentTransposedAccidentals = Object.assign({}, currentTransposedAccidentals);
+            return str;
+        } else {
+            return transposePitchByKey(str, currentOriginalKey, currentTransposedKey, currentMode, currentOriginalAccidentals, currentTransposedAccidentals, halfSteps);
+        }
+   });
 }
 
 function getKeyObjectAndMode(keyStr) {
@@ -173,7 +212,6 @@ function getVoiceInfo(tuneBody) {
     voiceInfoLines.forEach((voiceInfoLine) => {
         const firstSplit = voiceInfoLine.split("V:");
         const secondSplit = firstSplit[1].split(' ');
-        console.log(secondSplit);
         const name = secondSplit[0];
         if(!(name in voiceInfoObj)) voiceInfoObj[name] = '';
         voiceInfoObj[name] += secondSplit.slice(1).join(" ");
@@ -181,8 +219,8 @@ function getVoiceInfo(tuneBody) {
     return voiceInfoObj
 }
 
-console.log(splitHeadKeyAndBody(`X:1
-K:C
+console.log(transposeABC(`X:1
+K:C clef=treble-8 middle=C transpose=-2 octave=3 stafflines=2
 V:T1 name=test subname=test
 (B2c2 d2g2) | f6e2 | (d2c2 d2)e2 | d4 c2z2 |
 (B2c2 d2g2) | f8 | d3c (d2fe) | H d6 ||
@@ -194,4 +232,4 @@ V:B1
 (d2f2 b2e'2) | d'8 | g3g  g4 | H^f6 || %this is a comment
 V:B2 clef=bass test
 x8 | x8 | x8 | x8 | [r:this is a remark]
-x8 | z2B2 c2d2 | e3e [K:C MIX] (d2c2) | H d6 ||`));
+x8 | z2B2 c2d2 | e3e [K:C MIX] (d2c2) | H d6 ||`, 2));
