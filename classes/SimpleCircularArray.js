@@ -31,4 +31,11 @@ module.exports.SimpleCircularArray = class SimpleCircularArray {
         }
         return -1;
     }
+
+    find(testingFunction) {
+        for(let elem of this._array) {
+            if(testingFunction(elem)) return elem;
+        }
+        return undefined;
+    }
 }

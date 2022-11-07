@@ -11,7 +11,7 @@ Object.defineProperty(String.prototype, 'includesIgnoreCase', {
 module.exports.transposeKey = function (key, halfSteps, opts) {
     if(!key.length || key === 'none') return key; //preserve the key if there is no key
     //first find the key in the table
-    let letter = key.replace(/dorian|dor|phrygian|phr|mixolydian|mix|lydian|lyd|minor|min|m|locrian|loc/i, "").trim();
+    let letter = key.replace(/dorian|dor|phrygian|phr|mixolydian|mix|lydian|lyd|minor|min|m|aeolian|aeo|locrian|loc/i, "").trim();
     let mode = 'major';
     if(key.includesIgnoreCase('dor')) {
         mode = 'dorian';
@@ -23,6 +23,8 @@ module.exports.transposeKey = function (key, halfSteps, opts) {
         mode = 'lydian';
     } else if(key.includesIgnoreCase('m')) {
         mode = 'minor';
+    } else if(key.includesIgnoreCase('aeo')) {
+        mode = 'aeolian';
     } else if(key.includesIgnoreCase('loc')) {
         mode = 'locrian';
     }

@@ -2,19 +2,13 @@ const {ACCIDENTAL_NUMBER_PREFERENCES, SHARPS_OR_FLATS_PREFERENCES, KEYS} = requi
 const {transposeKey} = require('./transpose-key');
 const {transposePitchByKey} = require('./transpose-pitch-by-key');
 
-//need to preserve lyrics and other text
-//need to ignore clef:perc and key:HP / Hp (bagpipe music) when transposing
-//probably cannot just glue each voice together at the end as there may be information that changes throughout the voice (e.x. clef, or even transposition, for instance, switching to clarinet in A)
-//^the solution may be to just leave [V:] field + preserve clef and transposition information in key and voice fields
-//need to s in place within the voice, and to make sure that values provided after an inline [K:] field are also retained
-//need to support atonal transposition
-//need to support + signs in tune body
-//**information fields may contain spaces after the opening colon!**
-//need to support reading abc file DATA (not the file itself) with multiple tunes
-//need to support generating (but not actually writing) abc files with transposed tunes
-//need to transpose macros
 
-function transposeABC(abcTune, halfSteps, opts = {
+//need to ignore clef:perc and key:HP /
+//Hp (bagpipe music) when transposing
+//need to support atonal transposition
+//thin double barlines should probably not reset the measure's accidentals
+
+module.exports.transposeABC = function (abcTune, halfSteps, opts = {
     accidentalNumberPreference: ACCIDENTAL_NUMBER_PREFERENCES.PREFER_FEWER,
     preferSharpsOrFlats: SHARPS_OR_FLATS_PREFERENCES.PRESERVE_ORIGINAL
 }) {
@@ -60,7 +54,7 @@ function getKeyStrFromField(field) {
             const middleRegex = /middle/;
             field = field.replace(middleRegex, "");
             //then match with modes
-            const modes = /(major|maj|dorian|dor|phrygian|phr|mixolydian|mix|lydian|lyd|minor|min|m|locrian|loc)/i; 
+            const modes = /(major|maj|dorian|dor|phrygian|phr|mixolydian|mix|lydian|lyd|minor|min|m|aeolian|aeo|locrian|loc)/i; 
             const modeMatches = field.match(modes);
             if(modeMatches && !modeMatches[0].match(/major|maj/i)) { //ignores major / maj
                 key += modeMatches[0];
@@ -82,17 +76,6 @@ function getInstructionsFromKeyField(keyField) {
     if(!instructions) return '';
     else return ' ' + instructions.join(' ');
 }
-
-/*voices should be grouped into arrays of voice line objects
-voices = {
-  voiceName: [
-    {
-      originalLine
-      abcNotation
-    },
-  ]
-}
-*/
 
 function groupVoices(tuneBody) {
     let voices = {};
@@ -146,17 +129,15 @@ function transposeVoiceLine(voiceLine, currentOriginalKey, currentTransposedKey,
     //if the line is a comment or directive (starts with one or more %), or if the line is a field line
     if(!voiceLine.length) return voiceLine;
     if(voiceLine.startsWith("+") || voiceLine.startsWith("%")) return voiceLine;
-    const fieldLineRegex = /[IKLMmNPQRrsTUVWw]:/;
-    if(voiceLine.substring(0,2).match(fieldLineRegex)) return voiceLine;
-    const fieldCommentSymbolNewMeasureOrNote = /(\[\w:.*\])|(%.*\n)|(\![^\s]+\!)|(\|)|(::)|(_*\^*={0,1}[A-Ga-g],*'*)/g;
+    const fieldCommentSymbolNewMeasureOrNote = /(\[[IKLMmNPQRrsTUVWw]:.*\])|([IKLMmNPQRrsTUVWw]:.*)|(%.*\n)|(\![^\s]+\!)|(\|)|(::)|(_*\^*={0,1}[A-Ga-g],*'*)/g;
     return voiceLine.replace(fieldCommentSymbolNewMeasureOrNote, str => {
         const commentOrSymbol = /(%.*\n)|(\![^\s]+!)/;
-        const field = /\[\w:.*\]/;
+        const field = /(\[[IKLMmNPQRrsTUVWw]:.*\])|([IKLMmNPQRrsTUVWw]:.*)/;
         const newMeasure = /(\|)|(::)/;
         if(str.match(commentOrSymbol)) {
             return str;
         } else if(str.match(field)) {
-            if(str[1] === 'K') { // this needs to retain information besides K:
+            if(str[0] === 'K' || str[1] === 'K') { 
                 const keyInstructions = getInstructionsFromKeyField(str);
                 const keyStr = getKeyStrFromField(str);
                 [currentOriginalKey, currentMode] = getKeyObjectAndMode(keyStr);
@@ -164,7 +145,9 @@ function transposeVoiceLine(voiceLine, currentOriginalKey, currentTransposedKey,
                 currentTransposedKey = transposeKey(keyStr, halfSteps, opts);
                 const currentTransposedKeyStr = currentTransposedKey[currentMode] + currentMode;
                 currentTransposedAccidentals = Object.assign({}, currentTransposedKey.keySig);
-                return str.replace(/\[K:[^\]]+\]/, "[K:" + currentTransposedKeyStr  + keyInstructions + "]");
+                let newKeyField = "K:" + currentTransposedKeyStr  + keyInstructions;
+                if(str[0] === '[') newKeyField = '[' + newKeyField + ']';
+                return newKeyField;
             } else return str;
         } else if(str.match(newMeasure)) {
             currentOriginalAccidentals = Object.assign({}, currentOriginalKey.keySig);
@@ -179,7 +162,7 @@ function transposeVoiceLine(voiceLine, currentOriginalKey, currentTransposedKey,
 function getKeyObjectAndMode(keyStr) {
     if(!keyStr.length || keyStr === 'none') return keyStr; //preserve the key if there is no key
     //first find the key in the table
-    let letter = keyStr.replace(/dorian|dor|phrygian|phr|mixolydian|mix|lydian|lyd|minor|min|m|locrian|loc/i, "");
+    let letter = keyStr.replace(/dorian|dor|phrygian|phr|mixolydian|mix|lydian|lyd|minor|min|m|aeolian|aeo|locrian|loc/i, "");
     let mode = 'major';
     if(keyStr.includesIgnoreCase('dor')) {
         mode = 'dorian';
@@ -191,6 +174,8 @@ function getKeyObjectAndMode(keyStr) {
         mode = 'lydian';
     } else if(keyStr.includesIgnoreCase('m')) {
         mode = 'minor';
+    } else if(keyStr.includesIgnoreCase('aeo')) {
+        mode = 'aeolian'
     } else if(keyStr.includesIgnoreCase('loc')) {
         mode = 'locrian';
     }
@@ -204,32 +189,3 @@ function getKeyObjectAndMode(keyStr) {
     if(!key) throw new Error('Key not found in Key Pair');
     return [key, mode];
 }
-
-
-function getVoiceInfo(tuneBody) {
-    const voiceInfoLines = tuneBody.match(/V:[^\]\n]+\n/g);
-    const voiceInfoObj = {};
-    voiceInfoLines.forEach((voiceInfoLine) => {
-        const firstSplit = voiceInfoLine.split("V:");
-        const secondSplit = firstSplit[1].split(' ');
-        const name = secondSplit[0];
-        if(!(name in voiceInfoObj)) voiceInfoObj[name] = '';
-        voiceInfoObj[name] += secondSplit.slice(1).join(" ");
-    });
-    return voiceInfoObj
-}
-
-console.log(transposeABC(`X:1
-K:C clef=treble-8 middle=C transpose=-2 octave=3 stafflines=2
-V:T1 name=test subname=test
-(B2c2 d2g2) | f6e2 | (d2c2 d2)e2 | d4 c2z2 |
-(B2c2 d2g2) | f8 | d3c (d2fe) | H d6 ||
-V:T2 
-(G2A2 B2e2) | d6c2 | (B2A2 B2)c2 | B4 A2z2 |
-z8 | z8 | B3A (B2c2) | H A6 ||
-V:B1
-!abcdefg! z8 | z2f2 g2a2 | b2z2 z2 e2 | f4 f2z2 |
-(d2f2 b2e'2) | d'8 | g3g  g4 | H^f6 || %this is a comment
-V:B2 clef=bass test
-x8 | x8 | x8 | x8 | [r:this is a remark]
-x8 | z2B2 c2d2 | e3e [K:C MIX] (d2c2) | H d6 ||`, 2));
