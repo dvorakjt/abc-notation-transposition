@@ -1,33 +1,26 @@
-const {KEYS, ACCIDENTALS, ACCIDENTAL_NUMBER_PREFERENCES, SHARPS_OR_FLATS_PREFERENCES} = require('../constants');
-
-//replace this with a utility function, which should be imported from functions/utils
-Object.defineProperty(String.prototype, 'includesIgnoreCase', {
-    value: function(substr) {
-      return this.toUpperCase().includes(substr.toUpperCase());
-    },
-    enumerable: false
-});
+const {KEYS, ACCIDENTALS, ACCIDENTAL_NUMBER_PREFERENCES, SHARPS_OR_FLATS_PREFERENCES, REGULAR_EXPRESSIONS} = require('../constants');
+const {includesIgnoreCase} = require('./string-utils');
 
 //expects a capital letter as per the ABC standard
 module.exports.transposeKey = function (key, halfSteps, opts) {
     //return the key if key is HP, Hp, none or an empty string
     if(key === 'HP' || key === 'Hp' || key === 'none' || key === '') return key;
     //first find the key in the table
-    let letter = key.replace(/dorian|dor|phrygian|phr|mixolydian|mix|lydian|lyd|minor|min|m|aeolian|aeo|locrian|loc/i, "").trim();
+    let letter = key.replace(REGULAR_EXPRESSIONS.MODES, "").trim();
     let mode = 'major';
-    if(key.includesIgnoreCase('dor')) {
+    if(includesIgnoreCase(key, 'dor')) {
         mode = 'dorian';
-    } else if(key.includesIgnoreCase('phr')) {
+    } else if(includesIgnoreCase(key, 'phr')) {
         mode = 'phrygian';
-    } else if(key.includesIgnoreCase('mix')) {
+    } else if(includesIgnoreCase(key, 'mix')) {
         mode = 'mixolydian';
-    } else if(key.includesIgnoreCase('lyd')) {
+    } else if(includesIgnoreCase(key, 'lyd')) {
         mode = 'lydian';
-    } else if(key.includesIgnoreCase('m')) {
+    } else if(includesIgnoreCase(key, 'm')) {
         mode = 'minor';
-    } else if(key.includesIgnoreCase('aeo')) {
+    } else if(includesIgnoreCase(key, 'aeo')) {
         mode = 'aeolian';
-    } else if(key.includesIgnoreCase('loc')) {
+    } else if(includesIgnoreCase(key, 'loc')) {
         mode = 'locrian';
     }
     const currentKeyPairIndex = KEYS.findIndex((keyPair) => {
