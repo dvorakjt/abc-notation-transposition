@@ -1,4 +1,10 @@
-const {KEYS, ACCIDENTALS, ACCIDENTAL_NUMBER_PREFERENCES, SHARPS_OR_FLATS_PREFERENCES, REGULAR_EXPRESSIONS} = require('../constants');
+const {
+    KEYS, 
+    ACCIDENTALS, 
+    ACCIDENTAL_NUMBER_PREFERENCES, 
+    SHARPS_OR_FLATS_PREFERENCES, 
+    REGULAR_EXPRESSIONS,
+} = require('../constants');
 const {includesIgnoreCase} = require('./string-utils');
 
 //expects a capital letter as per the ABC standard

@@ -1,4 +1,4 @@
-const { SimpleCircularArray } = require('../classes/SimpleCircularArray');
+const { SimpleCircularArray } = require('../classes');
 const { ACCIDENTALS } = require("./preferences");
 //find the index of the array containing the name of the key
 //move through the array until the requisite number of half steps have been accounted for

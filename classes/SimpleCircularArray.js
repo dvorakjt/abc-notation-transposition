@@ -1,4 +1,4 @@
-module.exports.SimpleCircularArray = class SimpleCircularArray {
+class SimpleCircularArray {
     _array;
 
     constructor(array = []) {
@@ -39,3 +39,5 @@ module.exports.SimpleCircularArray = class SimpleCircularArray {
         return undefined;
     }
 }
+
+module.exports.SimpleCircularArray = SimpleCircularArray;

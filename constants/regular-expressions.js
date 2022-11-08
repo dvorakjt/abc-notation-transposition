@@ -6,9 +6,9 @@ const REGULAR_EXPRESSION_STRINGS = {
     CLEFS : '((clef=){0,1}(treble|alto|tenor|bass|perc)([+\\-]8){0,1})',
     MIDDLE : '(middle=[^\\s\\]]+)',
     TRANSPOSE : '(transpose=[+\-]{0,1}\\d+)',
-    OCTAVE : '(octave=\\d+)',
+    OCTAVE : '(octave=[+\-]{0,1}\\d+)',
     STAFF_LINES : '(stafflines=\\d+)',
-    VOICE_NAME : 'V:\\s*[^\\s\\]]+', //older version 'V:\\s*[^\\s]+(\\s|\\])'
+    VOICE_NAME : '(?:V:\\s*)[^\\s\\]]+', //older version 'V:\\s*[^\\s]+(\\s|\\])'
     KEY_FIELD : '(K:.*)',
     VOICE_FIELD : '(V:.*)',
     INLINE_FIELD : '([IKLMmNPQRrsTUVWw]:.*)',
@@ -57,5 +57,5 @@ module.exports.REGULAR_EXPRESSIONS = {
     ),
     NEW_MEASURE : new RegExp(REGULAR_EXPRESSION_STRINGS.NEW_MEASURE),
     KEY_FIELD : new RegExp(REGULAR_EXPRESSION_STRINGS.KEY_FIELD),
-    VOICE_FIELD : new RegExp(REGULAR_EXPRESSION_STRINGS.VOICE_FIELD)
+    VOICE_FIELD : new RegExp(REGULAR_EXPRESSION_STRINGS.VOICE_FIELD, 'g')
 }   

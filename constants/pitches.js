@@ -1,4 +1,4 @@
-const { SimpleCircularArray } = require('../classes/SimpleCircularArray');
+const { SimpleCircularArray } = require('../classes');
 
 module.exports.DIATONIC_PITCHES = new SimpleCircularArray(["A", "B", "C", "D", "E", "F", "G"]);
 

@@ -1,5 +1,5 @@
-const {transposeKey} = require('../functions/transpose-key');
-const {ACCIDENTAL_NUMBER_PREFERENCES, SHARPS_OR_FLATS_PREFERENCES} = require('../constants');
+const {transposeKey} = require('../../../../functions/transpose-key');
+const {ACCIDENTAL_NUMBER_PREFERENCES, SHARPS_OR_FLATS_PREFERENCES} = require('../../../../constants');
 
 const defaultOpts = {
     accidentalNumberPreference: ACCIDENTAL_NUMBER_PREFERENCES.PREFER_FEWER,

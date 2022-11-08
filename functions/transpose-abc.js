@@ -1,4 +1,11 @@
-const {ACCIDENTAL_NUMBER_PREFERENCES, SHARPS_OR_FLATS_PREFERENCES, KEYS, REGULAR_EXPRESSIONS} = require('../constants');
+const {
+    ACCIDENTAL_NUMBER_PREFERENCES, 
+    SHARPS_OR_FLATS_PREFERENCES, 
+    KEYS, 
+    REGULAR_EXPRESSIONS,
+    ERROR_MESSAGES
+} = require('../constants');
+const {ImproperlyFormattedABCNotationError} = require('../classes');
 const {transposeKey} = require('./transpose-key');
 const {transposePitchByKey} = require('./transpose-pitch-by-key');
 const {transposePitchChromatically} = require('./tranpose-pitch-chromatically');
@@ -8,6 +15,8 @@ const transposeABC = function (abcTune, halfSteps, opts = {
     accidentalNumberPreference: ACCIDENTAL_NUMBER_PREFERENCES.PREFER_FEWER,
     preferSharpsOrFlats: SHARPS_OR_FLATS_PREFERENCES.PRESERVE_ORIGINAL
 }) {
+    validateInput(abcTune, halfSteps, opts);
+
     const [tuneHead, tuneKeyField, tuneBody] = splitHeadKeyAndBody(abcTune);
     const originalKeyStr = getKeyStrFromField(tuneKeyField);
 
@@ -50,11 +59,46 @@ const transposeABC = function (abcTune, halfSteps, opts = {
     return tuneHead + newHeadKeyStr + transposedTuneBody;
 }
 
+function validateInput(abcTune, halfSteps, opts) {
+    if(typeof abcTune !== 'string') throw new TypeError(ERROR_MESSAGES.ABC_NOTATION_TYPE_MISMATCH + typeof abcTune);
+    if(typeof halfSteps !== 'number') throw new TypeError(ERROR_MESSAGES.HALF_STEPS_TYPE_MISMATCH + typeof halfSteps);
+    if(!Number.isInteger(halfSteps)) throw new TypeError(ERROR_MESSAGES.HALF_STEPS_TYPE_MISMATCH + 'floating point');
+
+    if(typeof opts !== 'object') throw new TypeError(ERROR_MESSAGES.OPTS_OBJECT_TYPE_MISMATCH);
+
+    if(!('accidentalNumberPreference' in opts) || !('preferSharpsOrFlats' in opts)) {
+        throw new TypeError(ERROR_MESSAGES.OPTS_OBJECT_TYPE_MISMATCH);
+    }
+    if(
+        typeof opts.accidentalNumberPreference !== 'number' || 
+        typeof opts.preferSharpsOrFlats !== 'number'
+    ) throw new TypeError(ERROR_MESSAGES.OPTS_FIELD_TYPE_MISMATCH + typeof opts.accidentalNumberPreference + ' and ' +  typeof opts.preferSharpsOrFlats);
+    
+    const accidentalNumberPreferenceNumType = Number.isInteger(opts.accidentalNumberPreference) ? 'integer' : 'non-integer';
+    const preferSharpsOrFlatsNumType = Number.isInteger(opts.preferSharpsOrFlats) ? 'integer' : 'non-integer';
+
+    if(accidentalNumberPreferenceNumType !== 'integer' || preferSharpsOrFlatsNumType !== 'integer') {
+        throw new TypeError(ERROR_MESSAGES.OPTS_FIELD_TYPE_MISMATCH + accidentalNumberPreferenceNumType + ' and ' + preferSharpsOrFlatsNumType);
+    }
+
+    if(
+        opts.accidentalNumberPreference < 0 || 
+        opts.accidentalNumberPreference > 2 ||
+        opts.preferSharpsOrFlats < 0 ||
+        opts.preferSharpsOrFlats > 2
+    ) throw new RangeError(ERROR_MESSAGES.OPTS_FIELD_TYPE_MISMATCH + opts.accidentalNumberPreference + ' and ' + opts.preferSharpsOrFlats);
+    return;
+}
+
 function splitHeadKeyAndBody(abcTune) {
     const headerKeyAndBody = abcTune.split(REGULAR_EXPRESSIONS.KEY_FIELD);
+    if(headerKeyAndBody.length < 3 || headerKeyAndBody[0] === '') {
+        throw new ImproperlyFormattedABCNotationError(ERROR_MESSAGES.UNABLE_TO_SPLIT_HEAD_KEY_AND_BODY);
+    }
     const header = headerKeyAndBody[0];
     const key = headerKeyAndBody[1];
     const body = headerKeyAndBody.slice(2).join('');
+
     return [header, key, body];
 }
 
@@ -106,9 +150,8 @@ function getKeyObjectAndMode(keyStr) {
               return key[mode] === letter;
         }) != -1);
     });
-    if(!keyObj) throw new Error(`Key ${keyStr} not found in KEYS`);
+    if(!keyObj) throw new ImproperlyFormattedABCNotationError(`Key signature ${keyStr} not found in keys. Please check your ABC notation to ensure it contains a valid key.`);
     const key = keyObj.find(key => key[mode] === letter);
-    if(!key) throw new Error('Key not found in Key Pair');
     return [key, mode];
 }
 
@@ -130,10 +173,11 @@ function getVoiceNamesAndClefs(tuneHead) {
             const voiceNameMatches = voiceField.match(REGULAR_EXPRESSIONS.VOICE_NAME);
             const clef = getClef(voiceField);
             if(voiceNameMatches && clef) {
-                const voiceName = voiceFieldMatches[0];
+                const voiceName = voiceNameMatches[0].replace(/V:\s*/, "");
                 voiceObjects[voiceName] = clef;
             }
         });
+        return voiceObjects;
     }
 }
 
@@ -264,3 +308,10 @@ function handleKeyChange(str, voiceState, halfSteps, opts) {
 }
 
 module.exports.transposeABC = transposeABC;
+module.exports.validateInput = validateInput;
+module.exports.splitHeadKeyAndBody = splitHeadKeyAndBody;
+module.exports.getKeyStrFromField = getKeyStrFromField;
+module.exports.getKeyObjectAndMode = getKeyObjectAndMode;
+module.exports.getClef = getClef;
+module.exports.getVoiceNamesAndClefs = getVoiceNamesAndClefs;
+module.exports.getInstructionsFromKeyField = getInstructionsFromKeyField;
