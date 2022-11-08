@@ -1,0 +1,1 @@
+module.exports.transposeABC = require('./transpose-abc').transposeABC;

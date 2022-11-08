@@ -1,11 +1,13 @@
 const {isUpperCase} = require('./string-utils');
 
 //returns a capital letter. throws an error if no letter between a and g found (case insensitive)
-module.exports.getPitchLetter = function (pitch) {
+function getPitchLetter (pitch) {
     const matches = pitch.match(/[A-G]/i);
-    if(!matches) throw new Error("Pitch must contain a letter between a and g (case insensitive).");
+    if(!matches) throw new Error(`Pitch ${pitch} must contain a letter between a and g (case insensitive).`);
     return matches[0].toUpperCase();
 }
+
+module.exports.getPitchLetter = getPitchLetter;
 
 //returns an accidental if found, otherwise null
 module.exports.getAccidental = function (pitch) {

@@ -1,4 +1,5 @@
- const { getPitchLetter, getAccidental, getStoredAccidental, updateStoredAccidentals, getTransposedPitchAtOctave } = require('./transposition-utils');
+const { ENHARMONIC_PITCHES } = require('../constants');
+const { getPitchLetter, getAccidental, getStoredAccidental, updateStoredAccidentals, getTransposedPitchAtOctave } = require('./transposition-utils');
 
 module.exports.transposePitchChromatically = function (originalPitch, voiceState, halfSteps) {
     const originalPitchLetter = getPitchLetter(originalPitch);
@@ -27,6 +28,7 @@ module.exports.transposePitchChromatically = function (originalPitch, voiceState
         updateStoredAccidentals(voiceState.transposedAccidentals, transposedPitchLetter, transposedAccidental);
         displayAccidental = true;
     } else displayAccidental = false;
-    let transposedPitchAtOctave = getTransposedPitchAtOctave(originalAccidental, transposedPitchLetter, halfSteps);
+    let transposedPitchAtOctave = getTransposedPitchAtOctave(originalPitch, transposedPitchLetter, halfSteps);
     if(displayAccidental) transposedPitchAtOctave = transposedAccidental + transposedPitchAtOctave;
+    return transposedPitchAtOctave;
 }

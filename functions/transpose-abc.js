@@ -4,8 +4,6 @@ const {transposePitchByKey} = require('./transpose-pitch-by-key');
 const {transposePitchChromatically} = require('./tranpose-pitch-chromatically');
 const {includesIgnoreCase} = require('./string-utils');
 
-//need to support atonal transposition
-
 const transposeABC = function (abcTune, halfSteps, opts = {
     accidentalNumberPreference: ACCIDENTAL_NUMBER_PREFERENCES.PREFER_FEWER,
     preferSharpsOrFlats: SHARPS_OR_FLATS_PREFERENCES.PRESERVE_ORIGINAL
@@ -42,7 +40,13 @@ const transposeABC = function (abcTune, halfSteps, opts = {
         return voiceLineObj.abcNotation;
     });
     const transposedTuneBody = sortedVoices.join('\n');
-    const newHeadKeyStr = 'K:' + transposedKey[originalMode] + originalMode + getInstructionsFromKeyField(tuneKeyField);
+    let newHeadKeyStr = 'K:';
+    if(typeof transposedKey === 'string') {
+        newHeadKeyStr += transposedKey;
+    } else {
+        newHeadKeyStr += transposedKey[originalMode] + originalMode;
+    }
+    newHeadKeyStr += getInstructionsFromKeyField(tuneKeyField);
     return tuneHead + newHeadKeyStr + transposedTuneBody;
 }
 
@@ -259,43 +263,4 @@ function handleKeyChange(str, voiceState, halfSteps, opts) {
     return newKeyField;
 }
 
-
-
-console.log(transposeABC(`X:1
-T:Keys and modes
-M:4/4
-K:C
-T:C/CMAJOR/Cmajor
-CDEF GABc |\\
-K:CMAJOR
-CDEF GABc |\\
-K:Cmajor
-CDEF GABc |]
-T:C maj/ C major/C Major
-K:C maj
-CDEF GABc |\\
-K: C major
-CDEF GABc |\\
-K:C Major
-CDEF GABc |]
-T:C Lydian/C Ionian/C Mixolydian
-K:C Lydian
-CDEF GABc |\\
-K:C Ionian
-CDEF GABc |\\
-K:C Mixolydian
-CDEF GABc |]
-T:C Dorian/C Minor/Cm
-K:C Dorian
-CDEF GABc |\\
-K:C Minor
-CDEF GABc |\\
-K:Cm
-CDEF GABc |]
-T:C Aeolian/C Phrygian/C Locrian
-K:C Aeolian
-CDEF GABc |\\
-K:C Phrygian
-CDEF GABc |\\
-K:C Locrian
-CDEF GABc |]`, 12));
+module.exports.transposeABC = transposeABC;
