@@ -324,3 +324,4 @@ module.exports.getVoiceNamesAndClefs = getVoiceNamesAndClefs;
 module.exports.getInstructionsFromKeyField = getInstructionsFromKeyField;
 module.exports.groupVoices = groupVoices;
 module.exports.getVoiceName = getVoiceName;
+module.exports.transposeVoices = transposeVoices;

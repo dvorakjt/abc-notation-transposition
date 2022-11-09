@@ -58,9 +58,11 @@ function countOctaveModifiers (originalPitch, transposedPitchLetter, halfSteps) 
 }
 
 function applyOctaveModifiers (originalPitch, transposedPitchLetter, octaveModifierCount) {
+    const originalPitchLetter = originalPitch.match(/[A-Ga-g]/)[0];
+
     const modifiers = {
         commas: originalPitch.includes(",") ? originalPitch.match(/,/g) : [],
-        case: isUpperCase(originalPitch[0]) ? "upper" : "lower",
+        case: isUpperCase(originalPitchLetter) ? "upper" : "lower",
         apostrophes: originalPitch.includes("'") ? originalPitch.match(/'/g) : []
     }
 
@@ -91,7 +93,7 @@ function applyOctaveModifiers (originalPitch, transposedPitchLetter, octaveModif
     }
     if(modifiers.case === "upper") transposedPitchLetter = transposedPitchLetter.toUpperCase();
     else if(modifiers.case === "lower") transposedPitchLetter = transposedPitchLetter.toLowerCase();
-    transposedPitchLetter += modifiers.commas.join();
-    transposedPitchLetter += modifiers.apostrophes.join();
+    transposedPitchLetter += modifiers.commas.join('');
+    transposedPitchLetter += modifiers.apostrophes.join('');
     return transposedPitchLetter;
 }

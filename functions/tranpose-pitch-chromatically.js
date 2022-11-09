@@ -18,8 +18,8 @@ module.exports.transposePitchChromatically = function (originalPitch, voiceState
     //a sharp if it was transposed up
     let transposedPitch = transposedPitchGroup.find(pitch => pitch.match(/=/));
     if(!transposedPitch) {
-        if(halfSteps < 0) transposedPitch = transposedPitchGroup.find(pitch => pitch.match(/^_[A-G]$/));
-        else transposedPitch = transposedPitchGroup.find(pitch => pitch.match(/^\^[A-G]$/))
+        if(originalAccidental.includes('_') || (originalAccidental === '=' && halfSteps < 0)) transposedPitch = transposedPitchGroup.find(pitch => pitch.match(/^_[A-G]$/));
+        else transposedPitch = transposedPitchGroup.find(pitch => pitch.match(/^\^[A-G]$/));
     }
     transposedPitchLetter = getPitchLetter(transposedPitch);
     transposedAccidental = getAccidental(transposedPitch);
