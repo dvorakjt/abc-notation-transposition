@@ -12,10 +12,7 @@ class SimpleCircularArray {
         if(index >= this._array.length) {
             index = index % this._array.length;
         }
-        if(index < 0) {
-            while(index < -this._array.length) {
-                index += this._array.length;
-            }
+        while(index < 0) {
             index += this._array.length;
         }
         return this._array[index];

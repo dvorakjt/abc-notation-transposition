@@ -173,7 +173,7 @@ function getVoiceNamesAndClefs(tuneHead) {
             const voiceNameMatches = voiceField.match(REGULAR_EXPRESSIONS.VOICE_NAME);
             const clef = getClef(voiceField);
             if(voiceNameMatches && clef) {
-                const voiceName = voiceNameMatches[0].replace(/V:\s*/, "");
+                const voiceName = getVoiceName(voiceField);
                 voiceObjects[voiceName] = clef;
             }
         });
@@ -190,9 +190,16 @@ function getInstructionsFromKeyField(keyField) {
 function groupVoices(tuneBody) {
     let voices = {};
     const tuneLines = tuneBody.split('\n');
+    const tuneLinesSplitAtVoices = [];
+    tuneLines.forEach(line => {
+        console.log(line);
+        if(line.includes('[V:')) {
+            line.split(/(\[V:[^\]]+\])/).forEach(split => tuneLinesSplitAtVoices.push(split));
+        } else tuneLinesSplitAtVoices.push(line);
+    });
     let currentVoiceName = '';
-    for(let i = 0; i < tuneLines.length; i++) {
-        const currentLine = tuneLines[i];
+    for(let i = 0; i < tuneLinesSplitAtVoices.length; i++) {
+        const currentLine = tuneLinesSplitAtVoices[i];
         const newVoiceName = getVoiceName(currentLine);
         if(newVoiceName) currentVoiceName = newVoiceName;
         if(!voices[currentVoiceName]) voices[currentVoiceName] = [];
@@ -315,3 +322,5 @@ module.exports.getKeyObjectAndMode = getKeyObjectAndMode;
 module.exports.getClef = getClef;
 module.exports.getVoiceNamesAndClefs = getVoiceNamesAndClefs;
 module.exports.getInstructionsFromKeyField = getInstructionsFromKeyField;
+module.exports.groupVoices = groupVoices;
+module.exports.getVoiceName = getVoiceName;
