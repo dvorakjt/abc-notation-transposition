@@ -115,7 +115,7 @@ Note that for a key of "" or "none" (no key signature, i.e. atonal music), these
         //opts defaults to this value when it is not provided:
         const  defaultOptions = {
             accidentalNumberPreference : ACCIDENTAL_NUMBER_PREFERENCES.PREFER_FEWER,
-            sharpsOrFlatsPreference :  SHARPS_OR_FLATS_PREFERENCES.PRESERVE_ORIGINAL
+            preferSharpsOrFlats :  SHARPS_OR_FLATS_PREFERENCES.PRESERVE_ORIGINAL
         }
     
         //thus, this:
@@ -127,24 +127,24 @@ Note that for a key of "" or "none" (no key signature, i.e. atonal music), these
         //you can prefer more sharps or flats in the transposed key
         const  sadisticOptions = {
             accidentalNumberPreference:  ACCIDENTAL_NUMBER_PREFERENCES.PREFER_MORE,
-            sharpsOrFlatsPreference:  SHARPS_OR_FLATS_PREFERENCES.PRESERVE_ORIGINAL
+            preferSharpsOrFlats:  SHARPS_OR_FLATS_PREFERENCES.PRESERVE_ORIGINAL
         }
     
         let  transposedToCFlatMajor = transposeABC(abcNotation, -1, sadisticOptions);
     
         //you can also set accidentalNumberPreference to no preference which will cause the
         //function to always select a key based on the sharps or flats preference
-        //note that sharpsOrFlatsPreference is also evaluated when transposing to keys such as Gb major and F# major,
+        //note that preferSharpsOrFlats is also evaluated when transposing to keys such as Gb major and F# major,
         //which have the same number of flats and sharps, respectively
     
         const  preferFlats = {
             accidentalNumberPreference:  ACCIDENTAL_NUMBER_PREFERENCES.NO_PREFERENCE,
-            sharpsOrFlatsPreference:  SHARPS_OR_FLATS_PREFERENCES.PREFER_FLATS
+            preferSharpsOrFlats:  SHARPS_OR_FLATS_PREFERENCES.PREFER_FLATS
         }
         
         const  preferSharps = {
             accidentalNumberPreference:  ACCIDENTAL_NUMBER_PREFERENCES.NO_PREFERENCE,
-            sharpsOrFlatsPreference:  SHARPS_OR_FLATS_PREFERENCES.PREFER_SHARPS 
+            preferSharpsOrFlats:  SHARPS_OR_FLATS_PREFERENCES.PREFER_SHARPS 
         }
     
         transposedToCFlatMajor = transposeABC(abcNotation, -1, preferFlats);
