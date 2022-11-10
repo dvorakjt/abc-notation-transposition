@@ -7,10 +7,8 @@ function getPitchLetter (pitch) {
     return matches[0].toUpperCase();
 }
 
-module.exports.getPitchLetter = getPitchLetter;
-
 //returns an accidental if found, otherwise null
-module.exports.getAccidental = function (pitch) {
+function getAccidental (pitch) {
     const matches = pitch.match(/__|_|\^\^|\^|=/);
     if(!matches) return null;
     else return matches[0];
@@ -18,18 +16,18 @@ module.exports.getAccidental = function (pitch) {
 
 //returns the last stored accidental for the supplied pitchLetter. throws an error if the pitchLetter doesn't exist as a property
 //of the storedAccidentals object
-module.exports.getStoredAccidental = function (storedAccidentals, pitchLetter) {
+function getStoredAccidental (storedAccidentals, pitchLetter) {
     const accidental = storedAccidentals[pitchLetter];
-    if(!accidental) throw new Error("Could not find pitch letter in stored accidentals object.");
+    if(!accidental) throw new Error(`Could not find pitch letter ${pitchLetter} in stored accidentals object.`);
     return accidental;
 }
 
 //sets the pitch letter property on the supplied storedAccidentals object to the new accidental. return type is void.
-module.exports.updateStoredAccidentals = function (storedAccidentals, pitchLetter, accidental) {
+function updateStoredAccidentals (storedAccidentals, pitchLetter, accidental) {
     storedAccidentals[pitchLetter] = accidental;
 }
 
-module.exports.getTransposedPitchAtOctave = function(originalPitch, transposedPitchLetter, halfSteps) {
+function getTransposedPitchAtOctave (originalPitch, transposedPitchLetter, halfSteps) {
     const octaveModifierCount = countOctaveModifiers(originalPitch, transposedPitchLetter, halfSteps);
     return applyOctaveModifiers(originalPitch, transposedPitchLetter, octaveModifierCount);
 }
@@ -97,3 +95,11 @@ function applyOctaveModifiers (originalPitch, transposedPitchLetter, octaveModif
     transposedPitchLetter += modifiers.apostrophes.join('');
     return transposedPitchLetter;
 }
+
+module.exports.getPitchLetter = getPitchLetter;
+module.exports.getAccidental = getAccidental;
+module.exports.getStoredAccidental = getStoredAccidental;
+module.exports.updateStoredAccidentals = updateStoredAccidentals;
+module.exports.getTransposedPitchAtOctave = getTransposedPitchAtOctave;
+module.exports.countOctaveModifiers = countOctaveModifiers;
+module.exports.applyOctaveModifiers = applyOctaveModifiers;
