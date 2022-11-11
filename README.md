@@ -71,7 +71,7 @@ The module provides constants representing different intervals for ease of use.
         //INTERVALS.DESCENDING.<INTERVAL_NAME>
         //For example, INTERVALS.ASCENDING.MINOR_SIXTH 
         //INTERVALS.UNISON corresponds to 0 half steps
-        //Intervals can be multipied or added together
+        //Intervals can be multiplied or added together
 
         const upAMinorSecond = transposeABC(abcNotation, INTERVALS.ASCENDING.MINOR_SECOND);
         const downAMajorThird = transposeABC(abcNotation, INTERVALS.DESCENDING.MAJOR_THIRD);
@@ -235,7 +235,7 @@ Occasionally, transposition of a certain pitch will result in the introduction o
 
 For instance, consider an attempt to transpose an E𝄪 (E double-sharp) from C major to D major:
 
-The module will attempt to keep the scale degree of the pitch intact in the new key. E is the 3rd scale degree in C major, so some kind of E in C major should result in some kind of F in D major. However, because E𝄪 is 2 half steps above its normal pitch level in the key signature, it is impossible to represent this as some kind of F in D major, as this would mean raising *F#*by 2 half steps, which cannot be represented by traditional accidentals, as it would be 3 half steps about F natural. 
+The module will attempt to keep the scale degree of the pitch intact in the new key. E is the 3rd scale degree in C major, so some kind of E in C major should result in some kind of F in D major. However, because E𝄪 is 2 half steps above its normal pitch level in the key signature, it is impossible to represent this as some kind of F in D major, as this would mean raising *F#* by 2 half steps, which cannot be represented by traditional accidentals, as it would be 3 half steps about F natural. 
 
 The great news is that the module will transpose it to an enharmonic pitch, selected intelligently based on the accidentals in the key signature and the direction of transposition. It will then decide if the accident needs to be displayed based on the context the note was transposed from. Therefore, our E𝄪 in C major will become a G# in D major.
 
