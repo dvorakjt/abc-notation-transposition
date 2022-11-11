@@ -82,6 +82,8 @@ test('Expect keys with more accidentals to be favored.', () => {
     }
     expect(transposeKey('B', 0, opts).major).toBe("Cb");
     expect(transposeKey('Db', 0, opts).major).toBe("C#");
+    expect(transposeKey('F', 1, opts).major).toBe('Gb');
+    expect(transposeKey('G', -1, opts).major).toBe('F#');
 });
 
 test('Expect flat keys to be favored', () => {

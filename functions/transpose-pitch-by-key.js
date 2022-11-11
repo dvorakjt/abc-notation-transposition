@@ -53,7 +53,7 @@ function getScaleDegreeFromPitchLetter(pitchLetter, keyLetter) {
 //returns a letter from A-G. throws an error if the scale degree is not a number between 0 and 6 or the keyLetter is not 
 //a letter between A-G
 function getPitchLetterFromScaleDegree(scaleDegree, keyLetter) {
-    if(Number.isNaN(scaleDegree) || scaleDegree < 0 || scaleDegree > 6) {
+    if(typeof scaleDegree !== 'number' || scaleDegree < 0 || scaleDegree > 6) {
         throw new Error("scaleDegree should be a number between 0 and 6 (inclusive)");
     }
     if(!keyLetter.match(/[A-G]/)) throw new Error("keyLetter must be a capital letter between A and G");
@@ -173,6 +173,7 @@ function transposePitchChromatically(pitchLetter, keySignatureAccidental, deviat
         //if the pitch group contains a natural note, prefer that. otherwise, prefer a flat if the note was transposed down or
         //a sharp if it was transposed up
         let transposedPitch = transposedPitchGroup.find(pitch => pitch.match(/=/));
+        /* istanbul ignore else */
         if(!transposedPitch) {
             if(deviationFromKeySignature < 0) transposedPitch = transposedPitchGroup.find(pitch => pitch.match(/^_[A-G]$/));
             else transposedPitch = transposedPitchGroup.find(pitch => pitch.match(/^\^[A-G]$/))
@@ -187,3 +188,6 @@ function transposePitchChromatically(pitchLetter, keySignatureAccidental, deviat
 
 module.exports.getScaleDegreeFromPitchLetter = getScaleDegreeFromPitchLetter;
 module.exports.getPitchLetterFromScaleDegree = getPitchLetterFromScaleDegree;
+module.exports.getDeviationFromKeySignature = getDeviationFromKeySignature;
+module.exports.applyDeviation = applyDeviation;
+module.exports.transposePitchChromatically = transposePitchChromatically;
