@@ -12,3 +12,8 @@ test('Expect getVoiceNamesAndClefs to return an object with keys and values corr
         snaredrum: 'perc'
     });
 });
+
+test('Expect getVoiceNamesAndClefs to return an empty object for a tuneHead which includes V: lines but no clefs', () => {
+    const tuneHead = 'X:1\nT:A Very Good Title\nM:4/4\nL:1/4\nV:clarinet';
+    expect(getVoiceNamesAndClefs(tuneHead)).toEqual({});
+});

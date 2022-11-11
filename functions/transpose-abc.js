@@ -9,7 +9,7 @@ const {ImproperlyFormattedABCNotationError} = require('../classes');
 const {transposeKey} = require('./transpose-key');
 const {transposePitchByKey} = require('./transpose-pitch-by-key');
 const {transposePitchChromatically} = require('./tranpose-pitch-chromatically');
-const {includesIgnoreCase} = require('./string-utils');
+const {includesIgnoreCase, trimNewLines} = require('./string-utils');
 
 const transposeABC = function (abcTune, halfSteps, opts = {
     accidentalNumberPreference: ACCIDENTAL_NUMBER_PREFERENCES.PREFER_FEWER,
@@ -45,7 +45,10 @@ const transposeABC = function (abcTune, halfSteps, opts = {
     sortedVoices.sort((a,b) => {
         return a.originalLine - b.originalLine
     });
-    sortedVoices = sortedVoices.map(voiceLineObj => {
+    sortedVoices = sortedVoices.filter(voiceLineObj => {
+        return voiceLineObj.abcNotation !== '' && voiceLineObj.abcNotation !== '\n'
+    }).map(voiceLineObj => {
+        voiceLineObj.abcNotation = trimNewLines(voiceLineObj.abcNotation);
         return voiceLineObj.abcNotation;
     });
     const transposedTuneBody = sortedVoices.join('\n');
@@ -56,6 +59,7 @@ const transposeABC = function (abcTune, halfSteps, opts = {
         newHeadKeyStr += transposedKey[originalMode] + originalMode;
     }
     newHeadKeyStr += getInstructionsFromKeyField(tuneKeyField);
+    newHeadKeyStr += '\n';
     return tuneHead + newHeadKeyStr + transposedTuneBody;
 }
 
@@ -170,10 +174,9 @@ function getVoiceNamesAndClefs(tuneHead) {
     else {
         const voiceObjects = {};
         voiceFieldMatches.forEach((voiceField) => {
-            const voiceNameMatches = voiceField.match(REGULAR_EXPRESSIONS.VOICE_NAME);
+            const voiceName = getVoiceName(voiceField);
             const clef = getClef(voiceField);
-            if(voiceNameMatches && clef) {
-                const voiceName = getVoiceName(voiceField);
+            if(voiceName && clef) {
                 voiceObjects[voiceName] = clef;
             }
         });
@@ -192,7 +195,6 @@ function groupVoices(tuneBody) {
     const tuneLines = tuneBody.split('\n');
     const tuneLinesSplitAtVoices = [];
     tuneLines.forEach(line => {
-        console.log(line);
         if(line.includes('[V:')) {
             line.split(/(\[V:[^\]]+\])/).forEach(split => tuneLinesSplitAtVoices.push(split));
         } else tuneLinesSplitAtVoices.push(line);
@@ -222,7 +224,6 @@ function getVoiceName(voiceLine) {
 
 function transposeVoices(voices, originalStartingKey, originalMode, transposedStartingKey, voiceNamesAndClefs, defaultClef, halfSteps, opts) {
     const transposedVoices = {};
-    //change this to a for in loop. it's nicer to read
     Object.keys(voices).forEach(voiceName => {
 
         const voiceState = {
@@ -325,3 +326,7 @@ module.exports.getInstructionsFromKeyField = getInstructionsFromKeyField;
 module.exports.groupVoices = groupVoices;
 module.exports.getVoiceName = getVoiceName;
 module.exports.transposeVoices = transposeVoices;
+module.exports.resetAccidentals = resetAccidentals;
+module.exports.transposeVoiceLine = transposeVoiceLine;
+module.exports.checkForNewClefAndUpdateState = checkForNewClefAndUpdateState;
+module.exports.handleKeyChange = handleKeyChange;

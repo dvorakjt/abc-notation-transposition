@@ -184,3 +184,6 @@ function transposePitchChromatically(pitchLetter, keySignatureAccidental, deviat
     }
     return [transposedPitchLetter, transposedAccidental, displayAccidental];
 }
+
+module.exports.getScaleDegreeFromPitchLetter = getScaleDegreeFromPitchLetter;
+module.exports.getPitchLetterFromScaleDegree = getPitchLetterFromScaleDegree;

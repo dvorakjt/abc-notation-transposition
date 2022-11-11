@@ -40,17 +40,21 @@ function countOctaveModifiers (originalPitch, transposedPitchLetter, halfSteps) 
             halfSteps += 12;
             octaveModifierCount--;
         }
-        else if(halfSteps > 0) {
+        else {
             halfSteps -= 12;
             octaveModifierCount++;
         }
     }
     const pitches = ["C", "D", "E", "F", "G", "A", "B"];
     //determine whether any additional modifiers are necessary
-    if(halfSteps < 0 && pitches.indexOf(transposedPitchLetter) > pitches.indexOf(getPitchLetter(originalPitch))) {
+    const originalPitchLetter = getPitchLetter(originalPitch);
+    if(halfSteps < 0 && pitches.indexOf(transposedPitchLetter) > pitches.indexOf(originalPitchLetter)) {
         octaveModifierCount--;
-    } else if(halfSteps > 0 && pitches.indexOf(transposedPitchLetter) < pitches.indexOf(getPitchLetter(originalPitch))) {
+    } else if(halfSteps > 0 && pitches.indexOf(transposedPitchLetter) < pitches.indexOf(originalPitchLetter)) {
         octaveModifierCount++;
+    } else if(halfSteps === 0) {
+        if(originalPitchLetter === 'C' && transposedPitchLetter === 'B') octaveModifierCount--;
+        else if(originalPitchLetter === 'B' && transposedPitchLetter === 'C') octaveModifierCount++;
     }
     return octaveModifierCount;
 }
@@ -90,7 +94,7 @@ function applyOctaveModifiers (originalPitch, transposedPitchLetter, octaveModif
         }
     }
     if(modifiers.case === "upper") transposedPitchLetter = transposedPitchLetter.toUpperCase();
-    else if(modifiers.case === "lower") transposedPitchLetter = transposedPitchLetter.toLowerCase();
+    else transposedPitchLetter = transposedPitchLetter.toLowerCase();
     transposedPitchLetter += modifiers.commas.join('');
     transposedPitchLetter += modifiers.apostrophes.join('');
     return transposedPitchLetter;

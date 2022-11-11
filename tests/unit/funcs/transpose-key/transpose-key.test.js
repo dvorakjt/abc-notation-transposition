@@ -57,7 +57,22 @@ test('Expect all modes to transpose correctly. Expect keys with fewer accidental
     expect(transposeKey("Dblydian", 4, defaultOpts).lydian).toBe("F");
     expect(transposeKey("Dmix", 4, defaultOpts).mixolydian).toBe("F#");
     expect(transposeKey("Ebm", -1, defaultOpts).minor).toBe("D");
+    expect(transposeKey('Caeo', 2, defaultOpts).aeolian).toBe('D');
     expect(transposeKey("Elocrian", 11, defaultOpts).locrian).toBe("D#");
+});
+
+test('Expect PREFER_FEWER to work correctly with PREFER_SHARPS and PREFER_FLATS', () => {
+    const opts = {
+        accidentalNumberPreference: ACCIDENTAL_NUMBER_PREFERENCES.PREFER_FEWER,
+        preferSharpsOrFlats: SHARPS_OR_FLATS_PREFERENCES.PREFER_SHARPS
+    }
+    expect(transposeKey('E', 2, opts).major).toBe("F#");
+    expect(transposeKey('Ab', -2, opts).major).toBe("F#");
+
+    opts.preferSharpsOrFlats = SHARPS_OR_FLATS_PREFERENCES.PREFER_FLATS;
+
+    expect(transposeKey('E', 2, opts).major).toBe('Gb');
+    expect(transposeKey('Ab', -2, opts).major).toBe('Gb');
 });
 
 test('Expect keys with more accidentals to be favored.', () => {
@@ -77,6 +92,10 @@ test('Expect flat keys to be favored', () => {
     expect(transposeKey('F', 1, opts).major).toBe("Gb");
     expect(transposeKey('C', -1, opts).major).toBe('Cb');
     expect(transposeKey('D', -1, opts).major).toBe('Db');
+
+    opts.preferSharpsOrFlats = SHARPS_OR_FLATS_PREFERENCES.PRESERVE_ORIGINAL;
+
+    expect(transposeKey('F', 1, opts).major).toBe("Gb");
 });
 
 test('Expect sharp keys to be favored', () => {

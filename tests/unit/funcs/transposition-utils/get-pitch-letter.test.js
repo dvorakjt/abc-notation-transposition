@@ -12,3 +12,7 @@ test('Expect getPitchLetter to return a capital letter from A-G when passed a pi
     expect(getPitchLetter('__A,')).toBe('A');
     expect(getPitchLetter('_b')).toBe('B');
 });
+
+test('Expect getPitchLetter to throw an error if an invalid pitch is passed in as an argument.', () => {
+    expect(() => getPitchLetter('_Q,,,')).toThrow(new Error("Pitch _Q,,, must contain a letter between a and g (case insensitive)."));
+});

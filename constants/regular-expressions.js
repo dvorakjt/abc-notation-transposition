@@ -14,7 +14,7 @@ const REGULAR_EXPRESSION_STRINGS = {
     INLINE_FIELD : '([IKLMmNPQRrsTUVWw]:.*)',
     INLINE_FIELD_WITH_BRACKETS: '(\\[[IKLMmNPQRrsTUVWw]:.*\\])',
     COMMENT : '(%.*)', //older version : (%.*\\n)
-    SYMBOL : '(\\![^\\s]+\\!)',
+    SYMBOL : '(\\![^!]+\\!)',
     NEW_MEASURE: '(\\|)|(::)',
     NOTE : "(_*\\^*={0,1}[A-Ga-g],*'*)"
 }
@@ -49,7 +49,7 @@ module.exports.REGULAR_EXPRESSIONS = {
     ), 'g'),
     COMMENT_OR_SYMBOL : new RegExp(
         REGULAR_EXPRESSION_STRINGS.COMMENT + '|' +
-        REGULAR_EXPRESSION_STRINGS.SYMBOL
+        REGULAR_EXPRESSION_STRINGS.SYMBOL, 'g'
     ),
     FIELD : new RegExp(
         REGULAR_EXPRESSION_STRINGS.INLINE_FIELD_WITH_BRACKETS + '|' +

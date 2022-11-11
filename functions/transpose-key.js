@@ -39,9 +39,12 @@ module.exports.transposeKey = function (key, halfSteps, opts) {
     });
     const transposedKeyPair = KEYS.get(currentKeyPairIndex + halfSteps);
     let transposedKeyObj;
+    
     if(transposedKeyPair.length === 1) {
         transposedKeyObj = transposedKeyPair[0];
-    } else if(opts.accidentalNumberPreference === ACCIDENTAL_NUMBER_PREFERENCES.PREFER_FEWER) {
+    } 
+    
+    else if(opts.accidentalNumberPreference === ACCIDENTAL_NUMBER_PREFERENCES.PREFER_FEWER) {
         if(transposedKeyPair[0].numOfAccidentals < transposedKeyPair[1].numOfAccidentals) {
             transposedKeyObj = transposedKeyPair[0];
         }
@@ -51,16 +54,14 @@ module.exports.transposeKey = function (key, halfSteps, opts) {
         else if(opts.preferSharpsOrFlats === SHARPS_OR_FLATS_PREFERENCES.PREFER_SHARPS || 
             (opts.preferSharpsOrFlats === SHARPS_OR_FLATS_PREFERENCES.PRESERVE_ORIGINAL && currentKeyObj.contains === ACCIDENTALS.SHARPS)) 
         {
-            if(transposedKeyPair[0].contains === ACCIDENTALS.SHARPS) {
-                transposedKeyObj = transposedKeyPair[0];
-            } else transposedKeyObj = transposedKeyPair[1];
+            transposedKeyObj = transposedKeyPair[0]; //the first key in the key pair will always contain sharps, the second, flats
         } 
         else {
-            if(transposedKeyPair[0].contains === ACCIDENTALS.FLATS) {
-                transposedKeyObj = transposedKeyPair[0];
-            } else transposedKeyObj = transposedKeyPair[1];
+            transposedKeyObj = transposedKeyPair[1];
         }
-    } else if(opts.accidentalNumberPreference === ACCIDENTAL_NUMBER_PREFERENCES.NO_PREFERENCE) {
+    } 
+    
+    else if(opts.accidentalNumberPreference === ACCIDENTAL_NUMBER_PREFERENCES.NO_PREFERENCE) {
         if(opts.preferSharpsOrFlats === SHARPS_OR_FLATS_PREFERENCES.PREFER_SHARPS || 
             (opts.preferSharpsOrFlats === SHARPS_OR_FLATS_PREFERENCES.PRESERVE_ORIGINAL && currentKeyObj.contains === ACCIDENTALS.SHARPS)) 
         {

@@ -79,7 +79,7 @@ The module provides constants representing different intervals for ease of use.
         //INTERVALS.DESCENDING.<INTERVAL_NAME>
         //For example, INTERVALS.ASCENDING.MINOR_SIXTH 
         //INTERVALS.UNISON corresponds to 0 half steps
-        //Intervals can be multipied or added together
+        //Intervals can be multiplied or added together
 
         const  upAMinorSecond = transposeABC(abcNotation, INTERVALS.ASCENDING.MINOR_SECOND);
         const  downAMajorThird = transposeABC(abcNotation, INTERVALS.DESCENDING.MAJOR_THIRD);
