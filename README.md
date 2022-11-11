@@ -1,4 +1,7 @@
 ﻿# abc-notation-transposition
+
+![CI](https://github.com/dvorakjt/abc-notation-transposition/actions/workflows/run-tests.yml/badge.svg)
+
 A robust utility for transposing abc notation strings by any number of half steps. Capable of intelligently handling multiple voices, inline key changes, atonality, and more. 
 
 ## About
@@ -203,7 +206,7 @@ You may change keys at any point in the tune body by using an inline field like 
 
 ### Atonal Music
 
-The module is quite capable of handling atonal music. Here is an excerpt of the A clarinet part from Schoenberg's Pierror Lunaire transposed to concert pitch.
+The module is quite capable of handling atonal music. Here is an excerpt of the A clarinet part from Schoenberg's Pierrot Lunaire transposed to concert pitch.
 
     const {transposeABC, INTERVALS} = require('abc-notation-transposition');
     const  pierrotAClarinet =
@@ -314,5 +317,29 @@ Invalid (lacks a key field):
     `X:1
     CDEF`
 
-#### The backslash
+#### Escape Characters
 Note that the backslash is a meaningful character in abc notation. In a JavaScript String, this represents an escape character, so it itself must be escaped with a second backslash.
+
+## License
+
+MIT License
+
+Copyright (c) 2022 Joseph Dvorak
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
