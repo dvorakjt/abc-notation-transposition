@@ -8,9 +8,15 @@
     "coverage": "jest --collectCoverage --",
     "coverage:badge": "coverage-badge-creator"
   },
-  "keywords": [],
+  "keywords": ["abc", "music", "notation", "transpose", "transposition"],
   "author": "dvorakjt",
-  "license": "ISC",
+  "homepage": "https://github.com/dvorakjt/abc-notation-transposition#readme",
+  "bugs" : "https://github.com/dvorakjt/abc-notation-transposition/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dvorakjt/abc-notation-transposition.git"
+  },
   "devDependencies": {
     "coverage-badge-creator": "^1.0.14",
     "jest": "^29.2.2"

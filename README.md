@@ -26,6 +26,46 @@ Transposed strings could be passed to Paul Rosen's [abcjs](https://www.npmjs.com
 
 ### Simplest Use Case
 
+First, import the `transposeABC` function from `abc-notation-transposition` :
+
+    //ES6 module import syntax
+    import {transposeABC} from 'abc-notation-transposition';
+
+Or:
+
+    //CommonJS require syntax
+    const {transposeABC} = require('abc-notation-transposition');
+
+In its simplest form, `transposeABC` is a function which takes two parameters: an abc string, and a integer number of half steps:
+
+    const abcNotation =
+    "X:1\nM:C\nL:1/4\nK:C\nCDEF|GABc|]";
+
+    transposeABC(abcNotation, 1);
+
+Half steps can be negative if you wish to transpose the music down:
+
+    const abcNotation =
+    "X:2\nM:C\nL:1/4\nK:C\nCDEF|GABc|]";
+
+    transposeABC(abcNotation, -3);
+
+You should wrap the tranposition function in a try...catch block because it will throw an error if there is a syntax problem in the abc notation:
+
+    const abcNotation =
+    "X:3\nM:C\nL:1/4\nK:C\nCDEF|GABc|]";
+
+    try {
+        const transposedNotation = transposeABC(abcNotation, 1);
+
+        //do something with transposed notation here
+
+    } catch(e) {
+
+        //handle errors here
+
+    }
+
 In this example, the module is used to transpose a simple ABC melody up by 2 half steps from C major to D major.
 
     //es6 module import
@@ -36,7 +76,7 @@ In this example, the module is used to transpose a simple ABC melody up by 2 hal
     
     //valid abc notation string
     const abcNotation = 
-    "X:1\nM:C\nL:1/4\nK:C\nCDEF|GABc|]";
+    "X:4\nM:C\nL:1/4\nK:C\nCDEF|GABc|]";
     
     //wrap the transposition function in a try...catch block as it will 
     //throw an error if there is a syntax error in the abc notation string
@@ -66,7 +106,7 @@ The module provides constants representing different intervals for ease of use.
     
     //valid abc notation string
     const  abcNotation =
-    "X:2\nM:C\nL:1/4\nK:C\nCDEF|GABc|]";
+    "X:5\nM:C\nL:1/4\nK:C\nCDEF|GABc|]";
     
     try {
         //transposes the original abc by various intervals
@@ -103,7 +143,7 @@ Note that for a key of "" or "none" (no key signature, i.e. atonal music), these
    
     //valid abc notation string
     const abcNotation =
-    "X:3\nM:C\nL:1/4\nK:Cmaj\nCDEF|GABc|]";
+    "X:6\nM:C\nL:1/4\nK:Cmaj\nCDEF|GABc|]";
     
     try {
     
@@ -198,7 +238,7 @@ Note that only the key letter is case-sensitive. The mode can appear in any case
 You may change keys at any point in the tune body by using an inline field like this:
 
     const abcNotation =
-    `X:4
+    `X:7
     M:C
     L:1/4
     K:C
@@ -210,7 +250,7 @@ The module is quite capable of handling atonal music. Here is an excerpt of the 
 
     const {transposeABC, INTERVALS} = require('abc-notation-transposition');
     const  pierrotAClarinet =
-    `X:5
+    `X:8
     T:Pierrot Lunaire
     C:Arnold Schoenberg
     M:C
@@ -222,7 +262,7 @@ The module is quite capable of handling atonal music. Here is an excerpt of the 
     const  pierrotAtConcertPitch = transposeABC(pierrotAClarinet, INTERVALS.DESCENDING.MINOR_THIRD);
     
     /* yields:
-    `X:5
+    `X:8
     T:Pierrot Lunaire
     C:Arnold Schoenberg
     M:C
@@ -255,7 +295,7 @@ Voices can be organized in several different ways. For more information on this,
 Here is a simple example:
 
     const abcNotation =
-    `X:6
+    `X:9
     M:3/4
     L:1/8
     T:Concerto no. 1 in F minor
@@ -279,13 +319,13 @@ Tunes and voices with a percussion clef will not be transposed. There are a few 
 To indicate that an entire tune should use a percussion clef, unless otherwise specified in a voice or voices, set the clef in the head:
 
     const abcNotation =
-    `X:7
+    `X:10
     K:none clef=perc
 	ABCD`;
 To indicate that a specific voice should use a percussion clef, indicate this in a V field in the head or body, or in an inline K field in the tune body.
 
     const abcNotation =
-    `X:8
+    `X:11
     K:none
     V:SnareDrum clef=perc name="Snare Drum"
     V:Cymbals name=Cymbals
@@ -304,7 +344,7 @@ To indicate that a specific voice should use a percussion clef, indicate this in
 
 Valid:
 
-    `X:1
+    `X:12
     K:C
     CDEF`
 
@@ -314,11 +354,18 @@ Invalid (lacks a tune head):
     CDEF`
 Invalid (lacks a key field):
 
-    `X:1
+    `X:13
     CDEF`
 
 #### Escape Characters
 Note that the backslash is a meaningful character in abc notation. In a JavaScript String, this represents an escape character, so it itself must be escaped with a second backslash.
+
+## Contributing
+1. Fork the repo!
+2. Create your feature branch: git checkout -b my-new-awesome-feature
+3. Commit your changes: git commit -am 'Added an awesome feature'
+4. Push to the branch: git push origin my-new-awesome-feature
+5. Submit a pull request!
 
 ## License
 
