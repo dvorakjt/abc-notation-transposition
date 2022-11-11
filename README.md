@@ -1,6 +1,6 @@
 ﻿# abc-notation-transposition
 
-![CI](https://github.com/dvorakjt/abc-notation-transposition/actions/workflows/run-tests.yml/badge.svg)
+![CI](https://github.com/dvorakjt/abc-notation-transposition/actions/workflows/CI.yml/badge.svg) ![](https://img.shields.io/badge/Coverage-100%25-83A603.svg?prefix=$coverage$)
 
 A robust utility for transposing abc notation strings by any number of half steps. Capable of intelligently handling multiple voices, inline key changes, atonality, and more. 
 
