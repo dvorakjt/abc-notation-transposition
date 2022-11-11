@@ -22,6 +22,15 @@ Transposed strings could be passed to Paul Rosen's [abcjs](https://www.npmjs.com
 
 [EasyABC](https://easyabc.sourceforge.net/) provides a great environment in which to test ABC notation: https://github.com/jwdj/EasyABC
 
+## Installation
+To install, run:
+
+    npm i abc-notation-transposition
+
+or:
+
+    yarn add abc-notation-transposition
+
 ## Use Cases
 
 ### Simplest Use Case
