@@ -19,15 +19,6 @@ Transposed strings could be passed to Paul Rosen's [abcjs](https://www.npmjs.com
 
 [EasyABC](https://easyabc.sourceforge.net/) provides a great environment in which to test ABC notation: https://github.com/jwdj/EasyABC
 
-## Installation
-To install, run:
-
-    npm i abc-notation-transposition
-
-or:
-
-    yarn add abc-notation-transposition
-
 ## Use Cases
 
 ### Simplest Use Case
@@ -325,6 +316,3 @@ Invalid (lacks a key field):
 
 #### The backslash
 Note that the backslash is a meaningful character in abc notation. In a JavaScript String, this represents an escape character, so it itself must be escaped with a second backslash.
-
-### Putting it All Together
-
