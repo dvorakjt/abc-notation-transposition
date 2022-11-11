@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "coverage": "jest --collectCoverage --"
+    "coverage": "jest --coverage"
   },
   "keywords": [],
   "author": "dvorakjt",
