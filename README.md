@@ -349,7 +349,7 @@ To indicate that a specific voice should use a percussion clef, indicate this in
 
 ### Common Gotchas
 #### Lack of tune head / key
-`transposeAbc` expects abc notation which contains a head and body. The head is terminated by the K: field, and must, at minimum, also include an X: field (the tune reference number).
+`transposeABC` expects abc notation which contains a head and body. The head is terminated by the K: field, and must, at minimum, also include an X: field (the tune reference number).
 
 Valid:
 
