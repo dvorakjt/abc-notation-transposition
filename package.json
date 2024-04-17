@@ -1,6 +1,6 @@
 {
   "name": "abc-notation-transposition",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A robust utility for transposing ABC Notation by half steps.",
   "main": "index.js",
   "scripts": {
@@ -8,10 +8,16 @@
     "coverage": "jest --collectCoverage --",
     "coverage:badge": "coverage-badge-creator"
   },
-  "keywords": ["abc", "music", "notation", "transpose", "transposition"],
+  "keywords": [
+    "abc",
+    "music",
+    "notation",
+    "transpose",
+    "transposition"
+  ],
   "author": "dvorakjt",
   "homepage": "https://github.com/dvorakjt/abc-notation-transposition#readme",
-  "bugs" : "https://github.com/dvorakjt/abc-notation-transposition/issues",
+  "bugs": "https://github.com/dvorakjt/abc-notation-transposition/issues",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -21,9 +27,9 @@
     "coverage-badge-creator": "^1.0.14",
     "jest": "^29.2.2"
   },
-  "jest" : {
+  "jest": {
     "coverageReporters": [
-      "json-summary", 
+      "json-summary",
       "text",
       "lcov"
     ]
