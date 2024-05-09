@@ -2,7 +2,7 @@
 
 ![CI](https://github.com/dvorakjt/abc-notation-transposition/actions/workflows/CI.yml/badge.svg) ![](https://img.shields.io/badge/Coverage-100%25-83A603.svg?prefix=$coverage$)
 
-A robust utility for transposing abc notation strings by any number of half steps. Capable of intelligently handling multiple voices, inline key changes, atonality, and more. 
+A robust utility for transposing abc notation strings by any number of half steps. Capable of handling multiple voices, inline key changes, atonality, and more.
 
 ## About
 
@@ -18,11 +18,12 @@ The module expects to receive a valid abc notation string, so for more informati
 
 ### Use and testing
 
-Transposed strings could be passed to Paul Rosen's [abcjs](https://www.npmjs.com/package/abcjs) module to render them in the browser. It is important to note that abcjs comes with a built-in transposition function, but that this module could be useful for transposition of abc notation strings prior to rendering them, or if you want to transpose them without rendering them (for instance, using this module in combination with the fs module to write transposed abc to a  .abc file).
+Transposed strings could be passed to Paul Rosen's [abcjs](https://www.npmjs.com/package/abcjs) module to render them in the browser. It is important to note that abcjs comes with a built-in transposition function, but that this module could be useful for transposition of abc notation strings prior to rendering them, or if you want to transpose them without rendering them (for instance, using this module in combination with the fs module to write transposed abc to a .abc file).
 
 [EasyABC](https://easyabc.sourceforge.net/) provides a great environment in which to test ABC notation: https://github.com/jwdj/EasyABC
 
 ## Installation
+
 To install, run:
 
     npm i abc-notation-transposition
@@ -79,28 +80,28 @@ In this example, the module is used to transpose a simple ABC melody up by 2 hal
 
     //es6 module import
     import {transposeABC} from 'abc-notation-transposition';
-        
+
     //commonJS require syntax
     //const {transposeABC} = require('abc-notation-transposition');
-    
+
     //valid abc notation string
-    const abcNotation = 
+    const abcNotation =
     "X:4\nM:C\nL:1/4\nK:C\nCDEF|GABc|]";
-    
-    //wrap the transposition function in a try...catch block as it will 
+
+    //wrap the transposition function in a try...catch block as it will
     //throw an error if there is a syntax error in the abc notation string
     try {
        //transposes the original abc up by 2 half steps
        const transposedAbcNotation = transposeABC(abcNotation, 2);
-    
+
        //do something with transposedAbcNotation
-    
+
     } catch(e) {
        //handle errors here
        console.log(e.message);
     }
-    
-    //transposedAbcNotation will be: 
+
+    //transposedAbcNotation will be:
     //`X:1\nM:C\nL:1/4\nK:Dmajor\nDEFG|ABcd|]`
 
 ### Transposition by Named Intervals
@@ -109,19 +110,19 @@ The module provides constants representing different intervals for ease of use.
 
     //es6 module import
     import {transposeABC, INTERVALS} from  'abc-notation-transposition';
-    
+
     //commonJS require syntax
     //const {transposeABC, INTERVALS} = require('abc-notation-transposition');
-    
+
     //valid abc notation string
     const  abcNotation =
     "X:5\nM:C\nL:1/4\nK:C\nCDEF|GABc|]";
-    
+
     try {
         //transposes the original abc by various intervals
         //Typically, you will want INTERVALS.ASCENDING.<INTERVAL_NAME> or
         //INTERVALS.DESCENDING.<INTERVAL_NAME>
-        //For example, INTERVALS.ASCENDING.MINOR_SIXTH 
+        //For example, INTERVALS.ASCENDING.MINOR_SIXTH
         //INTERVALS.UNISON corresponds to 0 half steps
         //Intervals can be multiplied or added together
 
@@ -130,12 +131,14 @@ The module provides constants representing different intervals for ease of use.
         const upATritone = transposeABC(abcNotation, INTERVALS.ASCENDING.TRITONE);
         const upAnOctave = transposeABC(abcNotation, INTERVALS.ASCENDING.OCTAVE);
         const downTwoOctaves = transposeABC(abcNotation, INTERVALS.DESCENDING.OCTAVE * 2);
-        const upACompoundPerfectFifth = transposeABC(abcNotation, INTERVALS.ASCENDING.OCTAVE + INTERVALS.ASCENDING.PERFECT_FIFTH);
-        
+        const upACompoundPerfectFifth = transposeABC(
+          abcNotation,
+          INTERVALS.ASCENDING.OCTAVE + INTERVALS.ASCENDING.PERFECT_FIFTH
+        );
     } catch(e) {
         console.log(e.message);
     }
-    
+
 ### Options
 
 `transposeABC` accepts an optional opts parameter. The opts parameter allows you specify the transposition behavior when transposition could result in either of two keys. For example, transposition of a tune in C major by a tritone (6 half steps) could result in a tune in either Gb or F# major. Similarly, transposition of a tune in C major down by 1 half step could result in a tune in either B major or Cb major.
@@ -145,102 +148,112 @@ The opts parameter allows you to prefer keys with fewer accidentals, keys with m
 Note that for a key of "" or "none" (no key signature, i.e. atonal music), these options are not evaluated and the notation will be transposed chromatically according to different logic.
 
     //es6 module import syntax
-    import {transposeABC, INTERVALS, ACCIDENTAL_NUMBER_PREFERENCES, SHARPS_OR_FLATS_PREFERENCES} from  'abc-notation-transposition';
-    
+    import {
+      transposeABC,
+      INTERVALS,
+      ACCIDENTAL_NUMBER_PREFERENCES,
+      SHARPS_OR_FLATS_PREFERENCES
+    } from  'abc-notation-transposition';
+
     //commonJS require syntax
-    //const {transposeABC, INTERVALS, ACCIDENTAL_NUMBER_PREFERENCES, SHARPS_OR_FLATS_PREFERENCES} = require('abc-notation-transposition');
-   
+    //const {
+      transposeABC,
+      INTERVALS,
+      ACCIDENTAL_NUMBER_PREFERENCES,
+      SHARPS_OR_FLATS_PREFERENCES
+    } = require('abc-notation-transposition');
+
     //valid abc notation string
     const abcNotation =
     "X:6\nM:C\nL:1/4\nK:Cmaj\nCDEF|GABc|]";
-    
+
     try {
-    
+
         //opts defaults to this value when it is not provided:
         const defaultOptions = {
             accidentalNumberPreference : ACCIDENTAL_NUMBER_PREFERENCES.PREFER_FEWER,
             preferSharpsOrFlats :  SHARPS_OR_FLATS_PREFERENCES.PRESERVE_ORIGINAL
         }
-    
+
         //thus, this:
         const transposedWithImplicitDefaultOptions = transposeABC(abcNotation, 1);
-    
+
         //is equivalent to this:
         const transposedWithExplicitDefaultOptions = transposeABC(abcNotation, 1, defaultOptions);
-   
+
         //you can prefer more sharps or flats in the transposed key
         const sadisticOptions = {
             accidentalNumberPreference:  ACCIDENTAL_NUMBER_PREFERENCES.PREFER_MORE,
             preferSharpsOrFlats:  SHARPS_OR_FLATS_PREFERENCES.PRESERVE_ORIGINAL
         }
-    
+
         let transposedToCFlatMajor = transposeABC(abcNotation, -1, sadisticOptions);
-    
+
         //you can also set accidentalNumberPreference to no preference which will cause the
         //function to always select a key based on the sharps or flats preference
         //note that preferSharpsOrFlats is also evaluated when transposing to keys such as Gb major and F# major,
         //which have the same number of flats and sharps, respectively
-    
+
         const preferFlats = {
             accidentalNumberPreference:  ACCIDENTAL_NUMBER_PREFERENCES.NO_PREFERENCE,
             preferSharpsOrFlats:  SHARPS_OR_FLATS_PREFERENCES.PREFER_FLATS
         }
-        
+
         const preferSharps = {
             accidentalNumberPreference:  ACCIDENTAL_NUMBER_PREFERENCES.NO_PREFERENCE,
-            preferSharpsOrFlats:  SHARPS_OR_FLATS_PREFERENCES.PREFER_SHARPS 
+            preferSharpsOrFlats:  SHARPS_OR_FLATS_PREFERENCES.PREFER_SHARPS
         }
-    
+
         transposedToCFlatMajor = transposeABC(abcNotation, -1, preferFlats);
-  
+
         const transposedToCSharpMajor = transposeABC(abcNotation, 1, preferSharps);
-    
+
         //an interesting use case for these options is to transpose music at the unison in order to change the key
         //to a more readable enharmonic key
-    
+
         const transposedToBMajor = transposeABC(transposedToCFlatMajor, INTERVALS.UNISON); //default options will prefer fewer accidentals
-    
+
         const transposedToDbMajor = transposeABC(transposedToCSharpMajor, INTERVALS.UNISON);
-    
+
     } catch(e) {
         console.log(e.message);
     }
 
 ### Valid Key Signatures
 
-This module will evaluate any existing major or minor key, any existing mode, and atonal keys. 
+This module will evaluate any existing major or minor key, any existing mode, and atonal keys.
 
 Keys must be specified with a capital letter, optionally followed by a 'b' for a flat, or a '#' representing a sharp. The module will also accept 'none' or an empty string to represent no key signature (for atonal music).
 
-Bagpipe specific keys will cause the transposition function to ignore that voice, as bagpipe keys (notated in Abc with 'K:HP' or 'K:Hp') have very specific rules. 
+Bagpipe specific keys will cause the transposition function to ignore that voice, as bagpipe keys (notated in Abc with 'K:HP' or 'K:Hp') have very specific rules.
 
 See https://abcnotation.com/wiki/abc:standard:v2.1#kkey for more information.
 
     //Examples of valid keys:
     //Examples of major and ionian
-	const CMajor = 'K:Cmajor';
-	const DMajor = 'K:Dmaj'
-	const EMajor = 'K:E';
-	const FIonian = 'K:Fionian';
-	const GIonian = 'K:Gion';
-	
-	//examples of minor and aeolian
-	const Cminor = 'K:Cminor';
-	const Dminor = 'K:Dmin';
-	const Eminor = 'K:Em';
-	const Faeolian = 'K:Faeolian';
-	const Gaeolian = 'K:Gaeo';
-	
-	//examples of modes
-	const Ddorian = 'K:Ddorian'; //or 'Ddor'
-	const Ephrygian = 'K:Ephrygian'; //or 'Ephr'
-	const Flydian = 'K:Flydian'; //or 'Flyd'
-	const Gmixolydian = 'K:Gmixolydian'; //or 'Gmix'
-	const Blocrian = 'K:Blocrian'; //or 'Bloc'
+    const CMajor = 'K:Cmajor';
+    const DMajor = 'K:Dmaj'
+    const EMajor = 'K:E';
+    const FIonian = 'K:Fionian';
+    const GIonian = 'K:Gion';
 
-	//atonal K field:
-	const atonal = 'K:none';
-	const atonal2 = 'K:';
+    //examples of minor and aeolian
+    const Cminor = 'K:Cminor';
+    const Dminor = 'K:Dmin';
+    const Eminor = 'K:Em';
+    const Faeolian = 'K:Faeolian';
+    const Gaeolian = 'K:Gaeo';
+
+    //examples of modes
+    const Ddorian = 'K:Ddorian'; //or 'Ddor'
+    const Ephrygian = 'K:Ephrygian'; //or 'Ephr'
+    const Flydian = 'K:Flydian'; //or 'Flyd'
+    const Gmixolydian = 'K:Gmixolydian'; //or 'Gmix'
+    const Blocrian = 'K:Blocrian'; //or 'Bloc'
+
+    //atonal K field:
+    const atonal = 'K:none';
+    const atonal2 = 'K:';
 
 Note that only the key letter is case-sensitive. The mode can appear in any case and can be separated from the key letter by any number of spaces.
 
@@ -267,9 +280,9 @@ The module is quite capable of handling atonal music. Here is an excerpt of the 
     K:
     [V:Clarinet name="Klarinette in A."]
     !ppp!(f4F4)|z2(_A2g2(d2|d6).D)z|(=B=F=G)zz2._B,z|`;
-    
+
     const  pierrotAtConcertPitch = transposeABC(pierrotAClarinet, INTERVALS.DESCENDING.MINOR_THIRD);
-    
+
     /* yields:
     `X:8
     T:Pierrot Lunaire
@@ -283,15 +296,15 @@ The module is quite capable of handling atonal music. Here is an excerpt of the 
 
 ### New Measures & Introduced Accidentals
 
-Occasionally, transposition of a certain pitch will result in the introduction of an accidental that was not present in the original. 
+Occasionally, transposition of a certain pitch will result in the introduction of an accidental that was not present in the original.
 
 For instance, consider an attempt to transpose an E𝄪 (E double-sharp) from C major to D major:
 
-The module will attempt to keep the scale degree of the pitch intact in the new key. E is the 3rd scale degree in C major, so some kind of E in C major should result in some kind of F in D major. However, because E𝄪 is 2 half steps above its normal pitch level in the key signature, it is impossible to represent this as some kind of F in D major, as this would mean raising *F#* by 2 half steps, which cannot be represented by traditional accidentals, as it would be 3 half steps about F natural. 
+The module will attempt to keep the scale degree of the pitch intact in the new key. E is the 3rd scale degree in C major, so some kind of E in C major should result in some kind of F in D major. However, because E𝄪 is 2 half steps above its normal pitch level in the key signature, it is impossible to represent this as some kind of F in D major, as this would mean raising _F#_ by 2 half steps, which cannot be represented by traditional accidentals, as it would be 3 half steps about F natural.
 
 The great news is that the module will transpose it to an enharmonic pitch, selected intelligently based on the accidentals in the key signature and the direction of transposition. It will then decide if the accident needs to be displayed based on the context the note was transposed from. Therefore, our E𝄪 in C major will become a G# in D major.
 
-If a G# appeared previously in the measure, the accidental will not be displayed. If not, the accidental *will* be displayed, and, if, for instance, the E𝄪 was followed by an F (natural) in the printed music *within the same measure*, the module is smart enough to know that the G natural that results from transposition to Dmajor *does* need to be marked with a natural sign, even though it hasn't deviated from the key signature. Only the first occurrence of this note is marked, unless another foreign accidental is introduced later.
+If a G# appeared previously in the measure, the accidental will not be displayed. If not, the accidental _will_ be displayed, and, if, for instance, the E𝄪 was followed by an F (natural) in the printed music _within the same measure_, the module is smart enough to know that the G natural that results from transposition to Dmajor _does_ need to be marked with a natural sign, even though it hasn't deviated from the key signature. Only the first occurrence of this note is marked, unless another foreign accidental is introduced later.
 
 A new measure (indicated by a pipe '|'), resets the stored accidentals to those of the key signature.
 
@@ -318,11 +331,12 @@ Here is a simple example:
     [V:PianoRH]z!pp![CA,][CA,][CA,][CA,][CA,]|[CA,][CA,][CA,][CA,][CA,][CA,]|z[CA,][CA,][CA,][CA,][CA,]|[CA,][CA,][CA,][CA,][CA,][CA,]|
     [V:PianoLH]F,6 | z6 | F,6 |`;
 
-	const transposedToGMinor = transposeABC(abcNotation, 2);
+    const transposedToGMinor = transposeABC(abcNotation, 2);
 
 Even though the clarinet part is in a different key, each voice will be correctly transposed from the key that individual voice is in. Notice that only the clarinet voice required an inline K field, as the piano voices take their key from the K field in the head.
 
 ### Percussion
+
 Tunes and voices with a percussion clef will not be transposed. There are a few ways of indicating this.
 
 To indicate that an entire tune should use a percussion clef, unless otherwise specified in a voice or voices, set the clef in the head:
@@ -330,7 +344,8 @@ To indicate that an entire tune should use a percussion clef, unless otherwise s
     const abcNotation =
     `X:10
     K:none clef=perc
-	ABCD`;
+    ABCD`;
+
 To indicate that a specific voice should use a percussion clef, indicate this in a V field in the head or body, or in an inline K field in the tune body.
 
     const abcNotation =
@@ -346,9 +361,10 @@ To indicate that a specific voice should use a percussion clef, indicate this in
     [V:BassDrum][K:none clef=perc]
     ABCD|]
 
+### Troubleshooting Common Issues
 
-### Common Gotchas
 #### Lack of tune head / key
+
 `transposeABC` expects abc notation which contains a head and body. The head is terminated by the K: field, and must, at minimum, also include an X: field (the tune reference number).
 
 Valid:
@@ -357,19 +373,22 @@ Valid:
     K:C
     CDEF`
 
-Invalid (lacks a tune head):
+Invalid (lacks a reference number):
 
     `K:C
     CDEF`
+
 Invalid (lacks a key field):
 
     `X:13
     CDEF`
 
 #### Escape Characters
+
 Note that the backslash is a meaningful character in abc notation. In a JavaScript String, this represents an escape character, so it itself must be escaped with a second backslash.
 
 ## Contributing
+
 1. Fork the repo!
 2. Create your feature branch: git checkout -b my-new-awesome-feature
 3. Commit your changes: git commit -am 'Added an awesome feature'
