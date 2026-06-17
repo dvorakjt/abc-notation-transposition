@@ -1,3 +1,5 @@
+const BAR_SEP_TOKENS = ':|][|: :|[2 :|]2 :||: [|] :|] [|: :|| ||: :|: |:: ::| |[1 :|2 |] || [| :: .| |1 |: :| [1 [2 |';
+
 //separating strings allows them to be combinable and for flags to be added to individual regexes
 const REGULAR_EXPRESSION_STRINGS = {
     KEY_SIGNATURES : 'none|HP|Hp|([A-G][b#]{0,1})',
@@ -12,10 +14,11 @@ const REGULAR_EXPRESSION_STRINGS = {
     KEY_FIELD : '(K:.*)',
     VOICE_FIELD : '(V:.*)',
     INLINE_FIELD : '([IKLMmNPQRrsTUVWw]:.*)',
-    INLINE_FIELD_WITH_BRACKETS: '(\\[[IKLMmNPQRrsTUVWw]:.*\\])',
+    INLINE_FIELD_WITH_BRACKETS: '(\\[[IKLMmNPQRrsTUVWw]:.*?\\])', //The ? prevents the wildcard from being greedy. older version '(\\[[IKLMmNPQRrsTUVWw]:.*\\])'
     COMMENT : '(%.*)', //older version : (%.*\\n)
     SYMBOL : '(\\![^!]+\\!)',
     NEW_MEASURE: '(\\|)|(::)',
+    BAR_SEP: '(' + BAR_SEP_TOKENS.replaceAll('|', '\\|').replaceAll('[', '\\[').replaceAll(']', '\\]').replaceAll(' ', ')|(') + ')',
     NOTE : "(_*\\^*={0,1}[A-Ga-g],*'*)"
 }
 
@@ -39,12 +42,12 @@ module.exports.REGULAR_EXPRESSIONS = {
     COMMENT : new RegExp(REGULAR_EXPRESSION_STRINGS.COMMENT),
     SYMBOL : new RegExp(REGULAR_EXPRESSION_STRINGS.SYMBOL),
     NOTE : new RegExp(REGULAR_EXPRESSION_STRINGS.NOTE),
-    FIELD_COMMENT_SYMBOL_NEW_MEASURE_OR_NOTE : new RegExp((
+    FIELD_COMMENT_SYMBOL_BAR_SEP_OR_NOTE : new RegExp((
         REGULAR_EXPRESSION_STRINGS.INLINE_FIELD_WITH_BRACKETS + '|' +
         REGULAR_EXPRESSION_STRINGS.INLINE_FIELD + '|' +
         REGULAR_EXPRESSION_STRINGS.COMMENT + '|' +
         REGULAR_EXPRESSION_STRINGS.SYMBOL + '|' +
-        REGULAR_EXPRESSION_STRINGS.NEW_MEASURE + '|' +
+        REGULAR_EXPRESSION_STRINGS.BAR_SEP + '|' +
         REGULAR_EXPRESSION_STRINGS.NOTE
     ), 'g'),
     COMMENT_OR_SYMBOL : new RegExp(
@@ -56,6 +59,7 @@ module.exports.REGULAR_EXPRESSIONS = {
         REGULAR_EXPRESSION_STRINGS.INLINE_FIELD
     ),
     NEW_MEASURE : new RegExp(REGULAR_EXPRESSION_STRINGS.NEW_MEASURE),
+    BAR_SEP : new RegExp(REGULAR_EXPRESSION_STRINGS.BAR_SEP),
     KEY_FIELD : new RegExp(REGULAR_EXPRESSION_STRINGS.KEY_FIELD),
     VOICE_FIELD : new RegExp(REGULAR_EXPRESSION_STRINGS.VOICE_FIELD, 'g')
 }   

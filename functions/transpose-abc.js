@@ -268,7 +268,7 @@ function transposeVoiceLine(voiceLine, voiceState, halfSteps, opts) {
     if(!voiceLine.length) return voiceLine;
     if(voiceLine.startsWith("+") || voiceLine.startsWith("%")) return voiceLine;
     
-    return voiceLine.replace(REGULAR_EXPRESSIONS.FIELD_COMMENT_SYMBOL_NEW_MEASURE_OR_NOTE, str => {
+    return voiceLine.replace(REGULAR_EXPRESSIONS.FIELD_COMMENT_SYMBOL_BAR_SEP_OR_NOTE, str => {
         if(str.match(REGULAR_EXPRESSIONS.COMMENT_OR_SYMBOL)) {
             return str;
         } else if(str.match(REGULAR_EXPRESSIONS.FIELD)) {
@@ -279,8 +279,11 @@ function transposeVoiceLine(voiceLine, voiceState, halfSteps, opts) {
                 checkForNewClefAndUpdateState(str, voiceState);
                 return handleKeyChange(str, voiceState, halfSteps, opts);
             } else return str;
-        } else if(str.match(REGULAR_EXPRESSIONS.NEW_MEASURE)) {
-            resetAccidentals(voiceState);
+            return str;
+        } else if(str.match(REGULAR_EXPRESSIONS.BAR_SEP)) {
+            if(str.match(REGULAR_EXPRESSIONS.NEW_MEASURE)) {
+                resetAccidentals(voiceState);
+            }
             return str;
         } else if(voiceState.originalKey === 'HP' || voiceState.originalKey === 'Hp' || voiceState.clef === 'perc') {
             return str;
